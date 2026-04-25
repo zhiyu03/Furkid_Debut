@@ -4,95 +4,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**毛孩子出道计划 (Furkid Debut)** — AI pet makeover game for a 40-hour hackathon ("互动空间" track). An interactive Douyin experience that lets pets take the C-position spotlight. Users upload a pet photo, pick a style, get an AI-transformed image, and receive a fun AI fashion score.
+**毛孩子出道计划 (Furkid Debut)** — AI pet makeover for a hackathon / Douyin-style mobile web experience. Users upload a pet photo, pick accessories (headwear, makeup, styling, clothing) from icon grids, then **开始变装** calls the backend which runs **Replicate `openai/gpt-image-2`** (or a local mock when `REPLICATE_API_TOKEN` is unset).
 
 ## Commands
 
 ```bash
-# Install everything (run once)
-cd client && npm install && cd ../server && npm install
+# 在仓库根目录 Furkid_Debut/ — 安装一次（npm workspaces 会装 client + server）
+npm install
 
-# Development — run both simultaneously
-# Terminal 1:
-cd server && npm run dev          # Express on :3001, --watch auto-restart
+# 一条命令同时启动后端（默认 :3001，可由根目录 .env 的 `PORT` 修改）与前端（Vite，默认 :5173）
+npm run dev
+# 浏览器请打开 Vite 给出的地址（如 http://localhost:5173），不要打开后端端口当网页用
 
-# Terminal 2:
-cd client && npm run dev          # Vite dev server on :5173 with proxy to :3001
+# 若仍想分开跑：
+# cd server && npm run dev
+# cd client && npm run dev
 
-# Production build
-cd client && npm run build        # Output to client/dist/
+# 生产构建前端
+npm run build
 
-# Type check (no TS — use ESLint if added later)
+# 仅启动生产态后端（需先 npm run build）
+npm run start
 ```
 
 ## Architecture
 
 ```
-client/                    # React 18 + Vite + Tailwind CSS
-├── src/
-│   ├── App.jsx            # Main state machine: UPLOAD → STYLE → GENERATING → RESULT
-│   └── components/
-│       ├── ImageUpload    # Drag-and-drop / camera capture
-│       ├── StyleSelector  # 4 style cards (cny, cool, makeup, intern)
-│       ├── ResultDisplay  # Before/after comparison
-│       └── ScoreModal     # AI score popup
-└── vite.config.js         # Proxies /api → localhost:3001
+catalog/
+└── itemCatalog.json       # Shared: categories, per-category max counts, items + prompt fragments
 
-server/                    # Express + Multer
-├── index.js               # App entry, mounts routes, serves uploads/
+client/                    # React 18 + Vite + Tailwind CSS
+├── vite.config.js         # Proxies /api and /uploads → :3001; alias @catalog → ../catalog
+├── src/
+│   ├── App.jsx            # dress → generating → result; selections + /api/debut
+│   └── components/mobile/
+│       ├── MobileShell    # max-w 430px, safe-area
+│       ├── PetColumn      # ~1/3 width: image + selected strip
+│       ├── CategoryRail   # four category buttons (~2/3 width column)
+│       ├── CategoryPanel  # bottom sheet / overlay icon grid
+│       ├── SelectedStrip  # chips under pet image
+│       └── ResultView     # before / after + reset
+
+server/                    # Express + Multer + Replicate
+├── index.js               # trust proxy; static /uploads; routes
 ├── routes/
-│   ├── generate.js        # POST /api/generate — upload + transform + auto-score
-│   └── score.js           # POST /api/score — standalone scoring endpoint
+│   ├── debut.js           # POST /api/debut — multer + prompt + Replicate or mock copy
+│   ├── generate.js        # @deprecated POST /api/generate
+│   └── score.js           # @deprecated POST /api/score
 └── services/
-    ├── promptBuilder.js   # Maps style ID → English image-gen prompt
-    ├── imageGen.js        # Image-to-Image API wrapper (mock fallback when no keys)
-    └── scorer.js          # Vision LLM scorer (random fallback when no keys)
+    ├── debutPrompt.js     # buildDebutPrompt(selections) from catalog
+    ├── replicateDebut.js  # runGptImage2 → Buffer
+    ├── promptBuilder.js   # legacy style prompts
+    ├── imageGen.js
+    └── scorer.js
 ```
 
 ### Key design decisions
 
-- **No database** — images are saved to `server/uploads/` and served as static files. Sufficient for a hackathon demo.
-- **Mock fallbacks** — `imageGen.js` and `scorer.js` return placeholder data when `IMAGE_API_URL` / `VISION_API_URL` env vars are unset. This lets you develop the full UI flow without any API keys.
-- **Vite proxy** — `/api/*` requests are proxied to the Express server in dev, avoiding CORS issues.
-- **State machine in App.jsx** — four steps (`UPLOAD → STYLE → GENERATING → RESULT`) controlled by a single `step` state. Adding new steps means adding a new block in the JSX.
+- **No database** — uploads and outputs in `server/uploads/`.
+- **Shared catalog** — `catalog/itemCatalog.json` is imported on the client via `@catalog` alias and read on the server from disk for prompt building.
+- **Mock debut** — If `REPLICATE_API_TOKEN` is empty, `/api/debut` copies the uploaded file to a new name and returns it so the UI can be tested without Replicate.
+- **Real Replicate** — Requires `REPLICATE_API_TOKEN` and **`PUBLIC_BASE_URL`** (HTTPS in production) so `input_images` URLs are reachable by Replicate’s servers (not `http://localhost:3001`).
+- **Vite proxy** — `/api/*` and `/uploads/*` proxied to Express in dev.
 
-## Adding a new style
+## Adding a catalog item
 
-1. Add an entry to `STYLE_PROMPTS` in `server/services/promptBuilder.js` (id, prefix, details, suffix).
-2. Add a matching entry to the `STYLES` array in `client/src/components/StyleSelector.jsx` (id, name, emoji, desc).
-
-## Integrating real AI APIs
-
-Both services follow the same pattern:
-1. Set `*_API_URL` and `*_API_KEY` in `.env`.
-2. Uncomment/replace the example `fetch` block in the service file.
-3. The mock fallback only runs when env vars are empty.
-
-### imageGen.js
-- Input: file path + prompt string
-- Output: path to generated image saved in `server/uploads/`
-- Expects the API to accept a base64 image + text prompt and return a transformed image
-
-### scorer.js
-- Input: image URL + style info
-- Output: `{ score: number, comment: string }`
-- Expects a vision/chat-completion API that can accept image + text prompt
+1. Edit `catalog/itemCatalog.json`: under `items.<categoryId>`, add `{ id, emoji, label, prompt }` (`prompt` is English for the vision model).
+2. Adjust `maxPerCategory` if needed.
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and fill in:
+Copy `.env.example` to `.env` in the **repo root** (推荐). 可选再建 `server/.env` 只放本机端口等；**勿在 `server/.env` 里留空的 `REPLICATE_API_TOKEN=`**，否则会盖住根目录已填的 Token。服务端启动时会先读根 `.env`，再以 `server/.env` 覆盖同名变量。
 
 | Variable | Purpose |
 |---|---|
-| `IMAGE_API_URL` | Image-to-Image endpoint (leave empty for mock) |
-| `IMAGE_API_KEY` | API key for image generation |
-| `VISION_API_URL` | Vision LLM endpoint for scoring (leave empty for mock) |
-| `VISION_API_KEY` | API key for vision model |
+| `REPLICATE_API_TOKEN` | Replicate API token for `openai/gpt-image-2` |
+| `PUBLIC_BASE_URL` | Public origin for `/uploads/...` URLs (no trailing slash), required for real runs |
+| `DEBUT_ASPECT_RATIO` | Optional: `1:1`, `3:2`, or `2:3` only (model limit); default `2:3` |
 | `PORT` | Server port (default 3001) |
+
+Legacy: `IMAGE_API_*`, `VISION_API_*` for deprecated `/api/generate` and `/api/score`.
 
 ## Constraints
 
 - No TypeScript — plain JS throughout for speed.
 - No database — file-based storage only.
-- No authentication — this is a demo.
-- Target mobile viewport (this is a Douyin/互动空间 project).
+- No authentication — demo.
+- Target mobile viewport (max width ~430px shell).

@@ -1,0 +1,40 @@
+{
+  "categories": [
+    { "id": "headwear", "name": "头饰", "emoji": "👑" },
+    { "id": "makeup", "name": "妆容", "emoji": "💄" },
+    { "id": "styling", "name": "造型", "emoji": "✨" },
+    { "id": "clothing", "name": "衣物", "emoji": "👔" }
+  ],
+  "maxPerCategory": {
+    "headwear": 2,
+    "makeup": 3,
+    "styling": 2,
+    "clothing": 1
+  },
+  "items": {
+    "headwear": [
+      { "id": "bow", "emoji": "🎀", "label": "蝴蝶结", "prompt": "a cute fabric bow on top of the head" },
+      { "id": "crown", "emoji": "👑", "label": "小皇冠", "prompt": "a tiny golden crown on the head" },
+      { "id": "flower", "emoji": "🌸", "label": "小花", "prompt": "a delicate flower accessory behind one ear" },
+      { "id": "cap", "emoji": "🧢", "label": "棒球帽", "prompt": "a colorful baseball cap worn naturally" }
+    ],
+    "makeup": [
+      { "id": "blush", "emoji": "🌷", "label": "腮红感", "prompt": "soft natural blush on cheeks, pet-safe look" },
+      { "id": "sparkle", "emoji": "✨", "label": "闪片", "prompt": "subtle glitter highlights around the eyes" },
+      { "id": "liner", "emoji": "🖊️", "label": "眼线风", "prompt": "playful faux eyeliner marks, cartoon-cute" },
+      { "id": "lip", "emoji": "💋", "label": "唇妆感", "prompt": "cute glossy lip color effect on snout area" }
+    ],
+    "styling": [
+      { "id": "fluffy", "emoji": "☁️", "label": "蓬松毛", "prompt": "extra fluffy voluminous fur styling" },
+      { "id": "braid", "emoji": "🪢", "label": "小辫", "prompt": "tiny decorative braids or tied fur tufts" },
+      { "id": "dye", "emoji": "🌈", "label": "渐变毛色", "prompt": "soft pastel gradient fur highlights" },
+      { "id": "mohawk", "emoji": "⚡", "label": "朋克毛", "prompt": "a fun faux-hawk style tuft along the back" }
+    ],
+    "clothing": [
+      { "id": "sweater", "emoji": "🧶", "label": "毛衣", "prompt": "a cozy knit sweater fitted for a pet" },
+      { "id": "hoodie", "emoji": "🧥", "label": "卫衣", "prompt": "a streetwear hoodie with small hood down" },
+      { "id": "vest", "emoji": "🦺", "label": "马甲", "prompt": "a cute puffy vest harness style" },
+      { "id": "bandana", "emoji": "🧣", "label": "围巾", "prompt": "a patterned bandana around the neck" }
+    ]
+  }
+}
