@@ -23,11 +23,23 @@ export function buildDebutShareCaption(o) {
 export default function ResultView({ original, result, debutOutcome = null, onReset }) {
   const [mode, setMode] = useState('result')
   const [copied, setCopied] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareToast, setShareToast] = useState('')
 
   const shareText = useMemo(() => buildDebutShareCaption(debutOutcome), [debutOutcome])
+  const shareTitle = '这就是我家毛孩子的出道定妆'
+  const shareSubtitle = '长按保存或一键分享给好友'
 
   const heroSrc = mode === 'result' ? result : original
   const modeLabel = mode === 'result' ? '出道定妆' : '素人毛孩'
+
+  const imageUrl = useMemo(() => {
+    try {
+      return new URL(result, window.location.origin).toString()
+    } catch {
+      return result
+    }
+  }, [result])
 
   const handleCopyCaption = async () => {
     try {
@@ -38,6 +50,59 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
       setCopied(false)
     }
   }
+
+  const showToast = (msg) => {
+    setShareToast(msg)
+    window.setTimeout(() => setShareToast(''), 1800)
+  }
+
+  const handleDownloadImage = async () => {
+    try {
+      const resp = await fetch(imageUrl)
+      if (!resp.ok) throw new Error('download failed')
+      const blob = await resp.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = objectUrl
+      a.download = `furkid-debut-${Date.now()}.jpg`
+      a.click()
+      URL.revokeObjectURL(objectUrl)
+      showToast('已开始下载到相册')
+    } catch {
+      showToast('下载失败，请长按图片保存')
+    }
+  }
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(imageUrl)
+      showToast('已复制图片链接')
+    } catch {
+      showToast('复制失败，请稍后重试')
+    }
+  }
+
+  const handleCopyShareCaption = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText)
+      showToast('已复制分享文案')
+    } catch {
+      showToast('复制失败，请稍后重试')
+    }
+  }
+
+  const handleSocialGuide = (platform) => {
+    showToast(`已为你准备好内容，请前往${platform}粘贴分享`)
+  }
+
+  const shareActions = [
+    { key: 'douyin', label: '抖音好友', icon: '♪', bg: 'bg-black', onClick: () => handleSocialGuide('抖音') },
+    { key: 'download', label: '下载至相册', icon: '↓', bg: 'bg-zinc-500', onClick: handleDownloadImage },
+    { key: 'copy-link', label: '复制链接', icon: '🔗', bg: 'bg-sky-500', onClick: handleCopyLink },
+    { key: 'wechat', label: '微信', icon: '微', bg: 'bg-emerald-500', onClick: () => handleSocialGuide('微信') },
+    { key: 'moments', label: '朋友圈', icon: '圈', bg: 'bg-lime-500', onClick: () => handleSocialGuide('朋友圈') },
+    { key: 'qzone', label: 'QQ空间', icon: 'Q', bg: 'bg-amber-500', onClick: () => handleSocialGuide('QQ空间') },
+  ]
 
   const score = debutOutcome?.debutScore
   const tierLabel = debutOutcome?.debutTierLabel
@@ -176,13 +241,22 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
             <pre className="mt-1 max-h-20 overflow-y-auto whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-gray-800">
               {shareText}
             </pre>
-            <button
-              type="button"
-              onClick={handleCopyCaption}
-              className="mt-2 w-full rounded-full border-2 border-rose-200 bg-white py-2 text-center text-xs font-bold text-rose-900 shadow-sm active:scale-[0.99]"
-            >
-              {copied ? '已复制到剪贴板' : '一键复制文案 + 话题'}
-            </button>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setShareOpen(true)}
+                className="rounded-full border-2 border-rose-200 bg-white py-2 text-center text-xs font-bold text-rose-900 shadow-sm active:scale-[0.99]"
+              >
+                打开分享面板
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyCaption}
+                className="rounded-full border-2 border-rose-200 bg-white py-2 text-center text-xs font-bold text-rose-900 shadow-sm active:scale-[0.99]"
+              >
+                {copied ? '已复制到剪贴板' : '一键复制文案'}
+              </button>
+            </div>
           </div>
 
           <button
@@ -197,6 +271,74 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
           </p>
         </div>
       </div>
+
+      {shareOpen && (
+        <div className="fixed inset-0 z-50 bg-black/45">
+          <button
+            type="button"
+            aria-label="关闭分享面板"
+            className="absolute inset-0"
+            onClick={() => setShareOpen(false)}
+          />
+          <div className="relative flex h-full w-full flex-col justify-end p-3">
+            <div className="mx-auto flex w-full max-w-[400px] max-h-[70vh] flex-col">
+              <div className="mb-1.5 flex justify-center">
+                <div className="w-full max-w-[292px] rounded-3xl bg-white p-2.5 shadow-2xl ring-1 ring-black/5">
+                  <img
+                    src={result}
+                    alt="分享卡片预览"
+                    className="h-auto max-h-[36vh] w-full rounded-2xl object-cover"
+                  />
+                  <p className="mt-1.5 text-center text-xs font-extrabold text-zinc-900">{shareTitle}</p>
+                  <p className="mt-0.5 text-center text-[10px] text-zinc-500">{shareSubtitle}</p>
+                </div>
+              </div>
+              <div className="rounded-3xl bg-white px-4 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2 shadow-2xl">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-[13px] font-bold text-zinc-900">分享至</p>
+                  <button
+                    type="button"
+                    onClick={() => setShareOpen(false)}
+                    className="inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-zinc-100 text-sm text-zinc-500"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-y-2">
+                  {shareActions.map((action) => (
+                    <button
+                      key={action.key}
+                      type="button"
+                      onClick={action.onClick}
+                      className="flex flex-col items-center gap-0.5 text-[10px] font-medium text-zinc-700 active:scale-[0.98]"
+                    >
+                      <span
+                        className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-[15px] font-bold text-white ${action.bg}`}
+                      >
+                        {action.icon}
+                      </span>
+                      <span>{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyShareCaption}
+                  className="mt-2 w-full rounded-full border border-rose-200 bg-rose-50 py-1.5 text-[11px] font-bold text-rose-800"
+                >
+                  复制分享文案
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {shareToast && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-black/80 px-3 py-1.5 text-xs font-medium text-white">
+          {shareToast}
+        </div>
+      )}
     </div>
   )
 }
