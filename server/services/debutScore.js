@@ -1,6 +1,16 @@
 /**
- * 阶段 1：按 catalog 选择规则计算出道潜力分与档位（娱乐向，非视觉识妆）。
+ * 出道潜力分（双轨）
+ * - rawScore：规则原始分，用于内部区分度与映射区间
+ * - displayScore（API 字段 debutScore）：映射到 80–100，满足「最低 80」展示需求
+ * 档位与角色池仍用 tierId，现按 displayScore 分档（与对外分数一致）
  */
+
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const catalogPath = path.join(__dirname, '../../catalog/itemCatalog.json')
 
 const CATEGORY_BASE = {
   makeup: 12,
@@ -11,24 +21,69 @@ const CATEGORY_BASE = {
 
 const ALL_CATEGORIES = ['headwear', 'makeup', 'styling', 'clothing']
 
-const TIER_BANDS = [
-  { max: 34, id: 'trainee', label: '练习生' },
-  { max: 54, id: 'backup', label: '预备役' },
-  { max: 69, id: 'rising', label: '上升期新人' },
-  { max: 84, id: 'center', label: '准 C 位' },
+/** 对外展示分区间 */
+const DISPLAY_MIN = 80
+const DISPLAY_MAX = 100
+
+/** 按展示分（80–100）分档，tier id 与 debutRoles.json 对齐 */
+const TIER_BANDS_DISPLAY = [
+  { max: 82, id: 'trainee', label: '练习生' },
+  { max: 86, id: 'backup', label: '预备役' },
+  { max: 90, id: 'rising', label: '上升期新人' },
+  { max: 94, id: 'center', label: '准 C 位' },
   { max: 100, id: 'diva', label: '本番出道' },
 ]
 
 const DEFAULT_ITEM_SCORE = 8
 
+function loadCatalogLimits() {
+  const raw = fs.readFileSync(catalogPath, 'utf8')
+  const doc = JSON.parse(raw)
+  const maxPer = doc.maxPerCategory || {}
+  const limits = {}
+  for (const c of ALL_CATEGORIES) {
+    limits[c] = Math.max(0, Number(maxPer[c]) || 0)
+  }
+  return limits
+}
+
+/**
+ * 在给定每类件数上限下，规则能达到的理论 raw 区间（用于展示分映射）
+ */
+export function computeRawScoreRange() {
+  const limits = loadCatalogLimits()
+  let rawMax = 0
+
+  for (const c of ALL_CATEGORIES) {
+    const n = limits[c]
+    const base = CATEGORY_BASE[c]
+    if (base !== undefined && n > 0) rawMax += base * n
+  }
+  const maxMakeup = limits.makeup
+  const allFourReachable = ALL_CATEGORIES.every((c) => limits[c] >= 1)
+  if (allFourReachable) rawMax += 10
+  if (maxMakeup >= 2) rawMax += 5
+  if (maxMakeup >= 3) rawMax += 3
+
+  /**
+   * 展示分映射下沿固定为 15：与 `scoreSelections` 中空选择的兜底 raw 对齐，
+   * 使「未选」稳定落在展示分 80，任意有效加分从 80 起单调上升。
+   */
+  const rawMin = 15
+
+  return { rawMin, rawMax, limits }
+}
+
 /**
  * @param {{ categoryId: string, itemId: string }[]} selections
- * @returns {{ score: number, tierId: string, tierLabel: string }}
+ * @returns {{ rawScore: number, score: number, tierId: string, tierLabel: string }}
+ * `score` 为对外展示分（80–100），与历史字段名一致供 computeDebutOutcome 使用
  */
 export function scoreSelections(selections) {
   const list = Array.isArray(selections) ? selections : []
-  let raw = 0
+  const limits = loadCatalogLimits()
 
+  let raw = 0
   for (const s of list) {
     const cat = s.categoryId
     const base = CATEGORY_BASE[cat]
@@ -52,25 +107,49 @@ export function scoreSelections(selections) {
   if (makeupCount >= 2) raw += 5
   if (makeupCount >= 3) raw += 3
 
-  let score = Math.round(raw)
+  let rawScore = Math.round(raw)
   if (list.length === 0) {
-    score = Math.max(score, 15)
+    rawScore = Math.max(rawScore, 15)
   }
-  score = Math.max(0, Math.min(100, score))
+  rawScore = Math.max(0, Math.min(1000, rawScore))
 
-  const { id: tierId, label: tierLabel } = tierFromScore(score)
-  return { score, tierId, tierLabel }
+  const { rawMin, rawMax } = computeRawScoreRange()
+  const lo = rawMin
+  const hi = Math.max(lo, rawMax)
+  let displayScore = DISPLAY_MIN
+  if (rawScore <= lo) {
+    displayScore = DISPLAY_MIN
+  } else {
+    const denom = hi - lo
+    if (denom > 0) {
+      const t = (rawScore - lo) / denom
+      displayScore = DISPLAY_MIN + Math.round(t * (DISPLAY_MAX - DISPLAY_MIN))
+    } else {
+      displayScore = DISPLAY_MAX
+    }
+  }
+  displayScore = Math.max(DISPLAY_MIN, Math.min(DISPLAY_MAX, displayScore))
+
+  const { id: tierId, label: tierLabel } = tierFromDisplayScore(displayScore)
+  return { rawScore, score: displayScore, tierId, tierLabel }
 }
 
 /**
- * @param {number} score
- * @returns {{ id: string, label: string }}
+ * @param {number} displayScore 80–100
  */
-export function tierFromScore(score) {
-  for (const band of TIER_BANDS) {
-    if (score <= band.max) {
+export function tierFromDisplayScore(displayScore) {
+  for (const band of TIER_BANDS_DISPLAY) {
+    if (displayScore <= band.max) {
       return { id: band.id, label: band.label }
     }
   }
-  return { id: TIER_BANDS[TIER_BANDS.length - 1].id, label: TIER_BANDS[TIER_BANDS.length - 1].label }
+  return {
+    id: TIER_BANDS_DISPLAY[TIER_BANDS_DISPLAY.length - 1].id,
+    label: TIER_BANDS_DISPLAY[TIER_BANDS_DISPLAY.length - 1].label,
+  }
+}
+
+/** @deprecated 旧接口按 0–100 raw 分档；保留导出避免外部误用时可查 */
+export function tierFromScore(score) {
+  return tierFromDisplayScore(Math.max(DISPLAY_MIN, Math.min(DISPLAY_MAX, score)))
 }

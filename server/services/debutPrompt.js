@@ -33,15 +33,17 @@ export function buildDebutPrompt(selections) {
 
   const stylingBlock =
     lines.length > 0
-      ? `Apply the following as one cohesive debut-ready pet look (spotlight polish for a reveal moment, not a generic beauty filter):\n${lines.join('\n')}`
-      : 'Enhance the pet photo with subtle debut-poster polish: studio key light, depth, and fur detail (no drastic identity change).'
+      ? `Apply the selected styling as one cohesive idol-debut concept look (premium grooming + stylist-level accessories, not random costume stacking):\n${lines.join('\n')}`
+      : 'Enhance the pet photo with subtle idol-debut polish: premium grooming, cinematic key light, soft stage depth, and high-detail fur texture.'
 
   return [
-    'Keep the same pet species, identity, and overall pose from the input photo.',
-    'Photorealistic lighting, soft shadows, high detail fur texture.',
-    'Creative direction: vertical short-form cover or K-pop-style debut teaser still—gentle spotlight and rim light, stage-ready portrait mood; stay photorealistic, avoid full cartoon or illustration.',
+    'Critical rule: keep the exact same pet identity, facial features, body proportions, and original background composition from the input photo.',
+    'Do not replace the scene, do not change species, do not create cartoon rendering, and do not add any text, logos, or watermarks.',
+    'Photorealistic editorial quality: clean lighting layers, realistic fur fibers, natural color grading, refined contrast, and premium texture fidelity.',
+    'Creative direction: idol debut teaser visual for short-form platforms, with confident stage-ready aura, polished but believable styling.',
     stylingBlock,
-    'Vertical composition for mobile screens, with a modest clean band of negative space (top or bottom) suitable for optional captions later—do not render any text, letters, logos, or watermarks in the image.',
+    'Output should feel like a real debut portrait shot by a professional pet fashion team: tasteful, trendy, and camera-ready.',
+    'Vertical composition for mobile screens with clean framing and balanced negative space.',
   ].join(' ')
 }
 

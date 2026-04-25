@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "description": "MVP：等生成时展示的他人作品墙（静态死数据，可后续换接口）",
+  "items": [
+    {
+      "id": "g-11843",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425211843.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-11848",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425211848.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-11854",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425211854.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-11900",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425211900.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-11904",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425211904.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14904",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214904.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14909",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214909.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14913",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214913.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14917",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214917.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14922",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214922.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14955",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214955.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14951",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214951.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14946",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214946.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14939",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214939.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14934",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214934.png",
+      "caption": "别人的萌宠搭配"
+    },
+    {
+      "id": "g-14926",
+      "imageUrl": "https://imageqw.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260425214926.png",
+      "caption": "别人的萌宠搭配"
+    }
+  ]
+}

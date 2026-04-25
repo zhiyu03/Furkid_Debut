@@ -1,40 +1,125 @@
 {
   "categories": [
-    { "id": "headwear", "name": "头饰", "emoji": "👑" },
+    { "id": "headwear", "name": "配饰", "emoji": "👑" },
     { "id": "makeup", "name": "妆容", "emoji": "💄" },
-    { "id": "styling", "name": "造型", "emoji": "✨" },
+    { "id": "styling", "name": "毛发造型", "emoji": "✨" },
     { "id": "clothing", "name": "衣物", "emoji": "👔" }
   ],
   "maxPerCategory": {
-    "headwear": 2,
+    "headwear": 4,
     "makeup": 3,
-    "styling": 2,
-    "clothing": 1
+    "styling": 3,
+    "clothing": 2
   },
   "items": {
     "headwear": [
-      { "id": "bow", "emoji": "🎀", "label": "蝴蝶结", "prompt": "a cute fabric bow on top of the head" },
-      { "id": "crown", "emoji": "👑", "label": "小皇冠", "prompt": "a tiny golden crown on the head" },
-      { "id": "flower", "emoji": "🌸", "label": "小花", "prompt": "a delicate flower accessory behind one ear" },
-      { "id": "cap", "emoji": "🧢", "label": "棒球帽", "prompt": "a colorful baseball cap worn naturally" }
+      { "id": "bow", "emoji": "🎀", "label": "蝴蝶结", "prompt": "a cute fabric bow on the head, polished and camera-ready" },
+      { "id": "crown", "emoji": "👑", "label": "小皇冠", "prompt": "a tiny refined golden crown centered on the head" },
+      { "id": "flower", "emoji": "🌸", "label": "小花", "prompt": "a delicate floral hair accessory near one ear" },
+      { "id": "cap", "emoji": "🧢", "label": "棒球帽", "prompt": "a stylish baseball cap fitted naturally for the pet" },
+      { "id": "black-glasses", "emoji": "🕶️", "label": "黑框眼镜", "prompt": "sleek black-rimmed glasses styled for a pet portrait" },
+      { "id": "pearl-collar", "emoji": "📿", "label": "珍珠项圈", "prompt": "an elegant pearl collar around the neck" },
+      { "id": "bell-scarf", "emoji": "🔔", "label": "铃铛围脖", "prompt": "a soft neck scarf with a small bell detail" },
+      { "id": "lace-headband", "emoji": "🪄", "label": "蕾丝发带", "prompt": "a delicate lace headband, sweet and refined" },
+      { "id": "street-bandana", "emoji": "🧣", "label": "潮酷头巾", "prompt": "a street-style bandana head wrap with cool attitude" },
+      { "id": "heart-clip", "emoji": "💗", "label": "爱心发夹", "prompt": "a tiny heart-shaped hair clip accent" },
+      { "id": "bow-tie", "emoji": "🎗️", "label": "小领结", "prompt": "a neat mini bow tie at the neck" },
+      { "id": "leather-choker", "emoji": "🖤", "label": "皮质颈饰", "prompt": "a tasteful leather neck accessory, clean and premium" }
     ],
     "makeup": [
-      { "id": "blush", "emoji": "🌷", "label": "腮红感", "prompt": "soft natural blush on cheeks, pet-safe look" },
-      { "id": "sparkle", "emoji": "✨", "label": "闪片", "prompt": "subtle glitter highlights around the eyes" },
-      { "id": "liner", "emoji": "🖊️", "label": "眼线风", "prompt": "playful faux eyeliner marks, cartoon-cute" },
-      { "id": "lip", "emoji": "💋", "label": "唇妆感", "prompt": "cute glossy lip color effect on snout area" }
+      { "id": "blush", "emoji": "🌷", "label": "腮红", "prompt": "soft natural blush tint on cheeks, subtle and photorealistic" },
+      { "id": "eye-glitter", "emoji": "✨", "label": "眼角闪片", "prompt": "fine glitter accents near the outer eye corners" },
+      { "id": "fine-liner", "emoji": "🖊️", "label": "精致眼线", "prompt": "clean, delicate eyeliner-inspired eye contour accents" }
     ],
     "styling": [
-      { "id": "fluffy", "emoji": "☁️", "label": "蓬松毛", "prompt": "extra fluffy voluminous fur styling" },
-      { "id": "braid", "emoji": "🪢", "label": "小辫", "prompt": "tiny decorative braids or tied fur tufts" },
-      { "id": "dye", "emoji": "🌈", "label": "渐变毛色", "prompt": "soft pastel gradient fur highlights" },
-      { "id": "mohawk", "emoji": "⚡", "label": "朋克毛", "prompt": "a fun faux-hawk style tuft along the back" }
+      { "id": "fluffy", "emoji": "☁️", "label": "蓬松毛", "prompt": "fluffy, lifted fur volume with clean groomed texture" },
+      { "id": "braids", "emoji": "🪢", "label": "小辫子", "prompt": "tiny decorative braids worked into the fur" },
+      { "id": "gradient", "emoji": "🌈", "label": "渐变毛色", "prompt": "soft gradient fur tinting with natural blending" },
+      { "id": "mohawk", "emoji": "⚡", "label": "朋克毛", "prompt": "a playful punk-inspired raised fur ridge style" },
+      { "id": "wool-curl", "emoji": "🧸", "label": "羊毛卷软毛", "prompt": "plush wool-like soft curls, sweet and airy" },
+      { "id": "sleek-soft", "emoji": "💫", "label": "温柔顺毛", "prompt": "smooth silky fur, softly brushed and elegant" },
+      { "id": "streak-dye", "emoji": "🎨", "label": "挑染毛", "prompt": "subtle streak highlights in selected fur sections" },
+      { "id": "lazy-wave", "emoji": "🌙", "label": "慵懒微卷", "prompt": "gentle loose waves for a relaxed stylish look" },
+      { "id": "clean-short", "emoji": "✂️", "label": "利落短修毛", "prompt": "clean short trim with sharp tidy silhouette" }
     ],
     "clothing": [
-      { "id": "sweater", "emoji": "🧶", "label": "毛衣", "prompt": "a cozy knit sweater fitted for a pet" },
-      { "id": "hoodie", "emoji": "🧥", "label": "卫衣", "prompt": "a streetwear hoodie with small hood down" },
-      { "id": "vest", "emoji": "🦺", "label": "马甲", "prompt": "a cute puffy vest harness style" },
-      { "id": "bandana", "emoji": "🧣", "label": "围巾", "prompt": "a patterned bandana around the neck" }
+      { "id": "suit", "emoji": "🤵", "label": "西装", "prompt": "a tailored pet-sized suit with clean lines" },
+      { "id": "hoodie", "emoji": "🧥", "label": "卫衣", "prompt": "a cozy street hoodie, modern and youthful" },
+      { "id": "princess-dress", "emoji": "👗", "label": "公主裙", "prompt": "a soft princess-style dress with layered texture" },
+      { "id": "lolita-cape", "emoji": "🫧", "label": "洛丽塔小斗篷", "prompt": "a cute lolita-inspired mini cape with refined trim" },
+      { "id": "workwear-jacket", "emoji": "🧰", "label": "工装外套", "prompt": "a utility workwear jacket with practical styling" },
+      { "id": "knit-sweater", "emoji": "🧶", "label": "软糯针织毛衣", "prompt": "a soft chunky knit sweater, warm and gentle" },
+      { "id": "utility-vest", "emoji": "🦺", "label": "机能小马甲", "prompt": "a functional utility vest with tactical accents" },
+      { "id": "furry-shawl", "emoji": "🪶", "label": "毛绒披肩", "prompt": "a plush furry shawl for luxurious stage styling" },
+      { "id": "sport-set", "emoji": "🏃", "label": "休闲运动套装", "prompt": "a sporty casual set, energetic and clean" }
     ]
-  }
+  },
+  "recommendedLooks": [
+    {
+      "id": "sweet",
+      "name": "甜美风",
+      "items": [
+        { "categoryId": "headwear", "itemId": "bow" },
+        { "categoryId": "headwear", "itemId": "heart-clip" },
+        { "categoryId": "makeup", "itemId": "blush" },
+        { "categoryId": "styling", "itemId": "wool-curl" },
+        { "categoryId": "clothing", "itemId": "princess-dress" },
+        { "categoryId": "clothing", "itemId": "lolita-cape" }
+      ]
+    },
+    {
+      "id": "luxury",
+      "name": "贵气风",
+      "items": [
+        { "categoryId": "headwear", "itemId": "crown" },
+        { "categoryId": "headwear", "itemId": "bow-tie" },
+        { "categoryId": "headwear", "itemId": "pearl-collar" },
+        { "categoryId": "styling", "itemId": "sleek-soft" },
+        { "categoryId": "clothing", "itemId": "suit" },
+        { "categoryId": "clothing", "itemId": "furry-shawl" }
+      ]
+    },
+    {
+      "id": "street-sweet-cool",
+      "name": "街头甜酷",
+      "items": [
+        { "categoryId": "headwear", "itemId": "cap" },
+        { "categoryId": "headwear", "itemId": "street-bandana" },
+        { "categoryId": "headwear", "itemId": "leather-choker" },
+        { "categoryId": "styling", "itemId": "mohawk" },
+        { "categoryId": "clothing", "itemId": "workwear-jacket" },
+        { "categoryId": "clothing", "itemId": "utility-vest" }
+      ]
+    },
+    {
+      "id": "gentle-lazy",
+      "name": "温柔慵懒",
+      "items": [
+        { "categoryId": "headwear", "itemId": "lace-headband" },
+        { "categoryId": "headwear", "itemId": "bell-scarf" },
+        { "categoryId": "makeup", "itemId": "blush" },
+        { "categoryId": "styling", "itemId": "lazy-wave" },
+        { "categoryId": "clothing", "itemId": "knit-sweater" }
+      ]
+    },
+    {
+      "id": "daily-energy",
+      "name": "元气日常",
+      "items": [
+        { "categoryId": "headwear", "itemId": "flower" },
+        { "categoryId": "styling", "itemId": "clean-short" },
+        { "categoryId": "clothing", "itemId": "sport-set" }
+      ]
+    },
+    {
+      "id": "niche-cool",
+      "name": "小众酷感",
+      "items": [
+        { "categoryId": "headwear", "itemId": "black-glasses" },
+        { "categoryId": "headwear", "itemId": "leather-choker" },
+        { "categoryId": "styling", "itemId": "streak-dye" },
+        { "categoryId": "clothing", "itemId": "utility-vest" }
+      ]
+    }
+  ]
 }

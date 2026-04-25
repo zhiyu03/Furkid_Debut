@@ -98,7 +98,7 @@ Furkid_Debut/
 | `index.js` | 应用入口：信任代理、挂载静态 `uploads`、注册路由 |
 | `routes/debut.js` | **主路径**：`POST /api/debut` — 接收 multipart、构建 prompt、调 Replicate 或 mock、返回 JSON（含图片 URL、出道分与角色等） |
 | `services/debutPrompt.js` | 根据选项与 catalog 构建英文 prompt |
-| `services/debutScore.js` | 规则向 0–100 分与档位 |
+| `services/debutScore.js` | 规则 **raw 分** + 线性映射到对外 **`debutScore`（80–100）**；档位按展示分区间 |
 | `services/debutRolePick.js` | 按档位与选择从 `debutRoles.json` 取角色 |
 | `services/debutOutcome.js` | 聚合分数、档位、角色，供 API 一次返回 |
 | `services/replicateDebut.js` | 封装 `runGptImage2` 等 Replicate 调用 |
@@ -110,7 +110,7 @@ Furkid_Debut/
 ## 7. 核心 API 与响应语义（概念）
 
 - **`POST /api/debut`**：请求体为 multipart（含图片文件 + 选项 JSON 等，以 `routes/debut.js` 实现为准）。
-- **成功响应**（无论真实模型或 mock）在业务上应包含结果图可访问 URL，以及由 `computeDebutOutcome` 产出的字段，例如：**`debutScore`**、**`debutTierId`** / **`debutTierLabel`**、**`debutRole`**（含 `title`、`tagline`、`emoji` 等），供结果页与分享使用。
+- **成功响应**（无论真实模型或 mock）在业务上应包含结果图可访问 URL，以及由 `computeDebutOutcome` 产出的字段，例如：**`debutScore`**（展示向 80–100）、**`debutScoreRaw`**（规则原始分）、**`debutTierId`** / **`debutTierLabel`**、**`debutRole`**（含 `title`、`tagline`、`emoji` 等），供结果页与分享使用。
 
 **Mock 模式**：当 **`REPLICATE_API_TOKEN`** 未配置时，服务端可将上传文件拷贝为新文件名返回，便于无密钥联调 UI 与出道分展示。
 

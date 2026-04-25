@@ -49,25 +49,20 @@ client/                    # React 18 + Vite + Tailwind CSS
 server/                    # Express + Multer + Replicate
 ├── index.js               # trust proxy; static /uploads; routes
 ├── routes/
-│   ├── debut.js           # POST /api/debut — multer + prompt + Replicate or mock copy; returns debutScore / tier / role
-│   ├── generate.js        # @deprecated POST /api/generate
-│   └── score.js           # @deprecated POST /api/score
+│   └── debut.js           # POST /api/debut — multer + prompt + Replicate or mock copy; returns debutScore / tier / role
 └── services/
     ├── debutPrompt.js     # buildDebutPrompt(selections) from catalog
-    ├── debutScore.js      # scoreSelections → 0–100 + tier (rule-based)
+    ├── debutScore.js      # scoreSelections：内部 raw 分 + 映射到对外 debutScore（80–100）与 tier
     ├── debutRolePick.js   # pickRole(tierId, selections) from debutRoles.json
     ├── debutOutcome.js    # computeDebutOutcome(selections) for API payload
-    ├── replicateDebut.js  # runGptImage2 → Buffer
-    ├── promptBuilder.js   # legacy style prompts
-    ├── imageGen.js
-    └── scorer.js
+    └── replicateDebut.js  # runGptImage2 → Buffer
 ```
 
 ### Key design decisions
 
 - **No database** — uploads and outputs in `server/uploads/`.
 - **Shared catalog** — `catalog/itemCatalog.json` is imported on the client via `@catalog` alias and read on the server from disk for prompt building.
-- **Mock debut** — If `REPLICATE_API_TOKEN` is empty, `/api/debut` copies the uploaded file to a new name and returns it so the UI can be tested without Replicate. Successful responses (mock or real) also include **`debutScore`**, **`debutTierId`**, **`debutTierLabel`**, **`debutRole`** `{ title, tagline, emoji }` from `computeDebutOutcome(selections)`.
+- **Mock debut** — If `REPLICATE_API_TOKEN` is empty, `/api/debut` copies the uploaded file to a new name and returns it so the UI can be tested without Replicate. Successful responses (mock or real) also include **`debutScore`**（展示向 80–100）、**`debutScoreRaw`**（规则原始分，便于运营/调试）、**`debutTierId`**, **`debutTierLabel`**, **`debutRole`** `{ title, tagline, emoji }` from `computeDebutOutcome(selections)`.
 - **Real Replicate** — Requires `REPLICATE_API_TOKEN` and **`PUBLIC_BASE_URL`** (HTTPS in production) so `input_images` URLs are reachable by Replicate’s servers (not `http://localhost:3001`).
 - **Vite proxy** — `/api/*` and `/uploads/*` proxied to Express in dev.
 
@@ -86,8 +81,6 @@ Copy `.env.example` to `.env` in the **repo root** (推荐). 可选再建 `serve
 | `PUBLIC_BASE_URL` | Public origin for `/uploads/...` URLs (no trailing slash), required for real runs |
 | `DEBUT_ASPECT_RATIO` | Optional: `1:1`, `3:2`, or `2:3` only (model limit); default `2:3` |
 | `PORT` | Server port (default 3001) |
-
-Legacy: `IMAGE_API_*`, `VISION_API_*` for deprecated `/api/generate` and `/api/score`.
 
 ## Constraints
 

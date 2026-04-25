@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import catalog from '@catalog/itemCatalog.json'
+import debutGallery from '@catalog/debutGallery.json'
 import { downscaleImageFile } from './utils/downscaleImage'
 import MobileShell from './components/mobile/MobileShell'
 import SelectedSidebar from './components/mobile/SelectedSidebar'
@@ -7,6 +8,7 @@ import MainImagePanel from './components/mobile/MainImagePanel'
 import CategoryTabs from './components/mobile/CategoryTabs'
 import ItemGrid from './components/mobile/ItemGrid'
 import ResultView from './components/mobile/ResultView'
+import WaitGalleryOverlay from './components/mobile/WaitGalleryOverlay'
 
 const STEPS = { DRESS: 'dress', GENERATING: 'generating', RESULT: 'result' }
 
@@ -18,6 +20,8 @@ function buildCategoryList() {
     items: catalog.items[c.id] || [],
   }))
 }
+
+const recommendedLooks = catalog.recommendedLooks || []
 
 export default function App() {
   const categories = useMemo(() => buildCategoryList(), [])
@@ -33,6 +37,9 @@ export default function App() {
   const [genProgress, setGenProgress] = useState(0)
   const [genFastDurationMs, setGenFastDurationMs] = useState(20000)
   const [genStartAt, setGenStartAt] = useState(0)
+  const [waitGalleryOpen, setWaitGalleryOpen] = useState(false)
+  const [gallerySession, setGallerySession] = useState(0)
+  const [completionMessage, setCompletionMessage] = useState(null)
 
   useEffect(() => {
     if (step !== STEPS.GENERATING || !genStartAt) return undefined
@@ -83,6 +90,12 @@ export default function App() {
     })
   }
 
+  const applyRecommendedLook = (look) => {
+    if (!look?.items?.length) return
+    setSelections(look.items)
+    setError(null)
+  }
+
   const handleDebut = async () => {
     if (!imageFile) {
       setError('请先上传宠物照片')
@@ -94,6 +107,9 @@ export default function App() {
     setGenFastDurationMs(fastDuration)
     setGenProgress(0)
     setGenStartAt(Date.now())
+    setWaitGalleryOpen(false)
+    setCompletionMessage(null)
+    setGallerySession((s) => s + 1)
     setStep(STEPS.GENERATING)
 
     const formData = new FormData()
@@ -111,6 +127,7 @@ export default function App() {
       if (typeof data.debutScore === 'number' && data.debutRole) {
         setDebutOutcome({
           debutScore: data.debutScore,
+          debutScoreRaw: typeof data.debutScoreRaw === 'number' ? data.debutScoreRaw : undefined,
           debutTierId: data.debutTierId,
           debutTierLabel: data.debutTierLabel,
           debutRole: data.debutRole,
@@ -120,11 +137,14 @@ export default function App() {
       }
       if (data.mock && data.message) setInfo(data.message)
       setGenProgress(100)
+      setWaitGalleryOpen(false)
+      setCompletionMessage('定妆完成！看看你的毛孩子吧')
       await new Promise((resolve) => window.setTimeout(resolve, 260))
       setStep(STEPS.RESULT)
     } catch (err) {
       setError(err.message || '出道定妆失败，请重试')
       setGenProgress(0)
+      setWaitGalleryOpen(false)
       setStep(STEPS.DRESS)
     }
   }
@@ -141,7 +161,15 @@ export default function App() {
     setInfo(null)
     setGenProgress(0)
     setGenStartAt(0)
+    setWaitGalleryOpen(false)
+    setCompletionMessage(null)
   }
+
+  useEffect(() => {
+    if (step !== STEPS.RESULT || !completionMessage) return undefined
+    const t = window.setTimeout(() => setCompletionMessage(null), 2800)
+    return () => window.clearTimeout(t)
+  }, [step, completionMessage])
 
   const activeCategoryLabel = categories.find((c) => c.id === activeCategory)?.name ?? ''
   const gridItems = catalog.items[activeCategory] || []
@@ -192,6 +220,24 @@ export default function App() {
             onToggle={(itemId) => toggleSelection(activeCategory, itemId)}
           />
 
+          {recommendedLooks.length > 0 && (
+            <div className="shrink-0 rounded-xl border border-rose-100 bg-rose-50/70 px-2 py-2">
+              <p className="mb-1.5 text-[10px] font-semibold text-rose-900">一键搭配 · 推荐配置</p>
+              <div className="flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {recommendedLooks.map((look) => (
+                  <button
+                    key={look.id}
+                    type="button"
+                    onClick={() => applyRecommendedLook(look)}
+                    className="shrink-0 rounded-full border border-rose-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-rose-900 shadow-sm active:scale-[0.98]"
+                  >
+                    {look.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button
             type="button"
             disabled={!imageFile}
@@ -204,23 +250,62 @@ export default function App() {
       )}
 
       {step === STEPS.GENERATING && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
-          <div className="w-full max-w-[19rem]">
-            <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
-              <span>正在生成中</span>
-              <span className="font-semibold text-brand">{Math.floor(genProgress)}%</span>
-            </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-rose-100">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-rose-400 via-pink-500 to-brand transition-[width] duration-300"
-                style={{ width: `${genProgress}%` }}
-              />
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          <div className="absolute left-1/2 top-1/2 z-0 w-full max-w-[19rem] -translate-x-1/2 -translate-y-1/2 px-3">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-full">
+                <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
+                  <span>正在生成中</span>
+                  <span className="font-semibold text-brand">{Math.floor(genProgress)}%</span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-rose-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-rose-400 via-pink-500 to-brand transition-[width] duration-300"
+                    style={{ width: `${genProgress}%` }}
+                  />
+                </div>
+              </div>
+              <p className="text-center text-sm text-gray-600">正在为你的毛孩子打光、定妆…</p>
             </div>
           </div>
-          <p className="text-center text-sm text-gray-600">正在为你的毛孩子打光、定妆…</p>
-          <p className="max-w-[18rem] text-center text-xs leading-relaxed text-gray-400">
-            前期会快速生成预览进度，最终出图以云端真实完成为准。
-          </p>
+
+          <div className="relative z-10 mx-auto mt-auto flex w-full max-w-[20rem] flex-col items-center gap-2.5 px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6">
+            <button
+              type="button"
+              onClick={() => setWaitGalleryOpen(true)}
+              className="w-full rounded-full border border-rose-200 bg-white/90 px-4 py-3 text-center text-xs font-bold text-rose-900 shadow-sm backdrop-blur-sm active:scale-[0.99]"
+            >
+              点击查看别人的萌宠搭配
+            </button>
+            <p className="max-w-[18rem] text-center text-[11px] leading-relaxed text-gray-400">
+              前期会快速生成预览进度，最终出图以云端真实完成为准。
+            </p>
+          </div>
+
+          <WaitGalleryOverlay
+            key={gallerySession}
+            open={waitGalleryOpen}
+            items={debutGallery.items || []}
+            onClose={() => setWaitGalleryOpen(false)}
+          />
+        </div>
+      )}
+
+      {completionMessage && step === STEPS.RESULT && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[70] flex justify-center px-4">
+          <div className="pointer-events-auto flex max-w-[20rem] items-center gap-2 rounded-2xl border border-rose-100 bg-white/95 px-4 py-3 text-sm font-semibold text-rose-950 shadow-lg backdrop-blur-sm">
+            <span className="text-base" aria-hidden>
+              ✨
+            </span>
+            <span>{completionMessage}</span>
+            <button
+              type="button"
+              onClick={() => setCompletionMessage(null)}
+              className="ml-1 rounded-full px-2 py-0.5 text-xs text-zinc-500 hover:bg-zinc-100"
+            >
+              关闭
+            </button>
+          </div>
         </div>
       )}
 

@@ -16,7 +16,7 @@ export function buildDebutShareCaption(o) {
  * @param {{
  *   original: string,
  *   result: string,
- *   debutOutcome: { debutScore: number, debutTierId: string, debutTierLabel: string, debutRole: { title: string, tagline: string, emoji: string } } | null,
+ *   debutOutcome: { debutScore: number, debutScoreRaw?: number, debutTierId: string, debutTierLabel: string, debutRole: { title: string, tagline: string, emoji: string } } | null,
  *   onReset: () => void,
  * }} props
  */
