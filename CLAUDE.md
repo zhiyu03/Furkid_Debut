@@ -31,7 +31,8 @@ npm run start
 
 ```
 catalog/
-└── itemCatalog.json       # Shared: categories, per-category max counts, items + prompt fragments
+├── itemCatalog.json       # Shared: categories, per-category max counts, items + prompt fragments
+└── debutRoles.json        # Tier labels + role pools for rule-based debut score UI
 
 client/                    # React 18 + Vite + Tailwind CSS
 ├── vite.config.js         # Proxies /api and /uploads → :3001; alias @catalog → ../catalog
@@ -43,16 +44,19 @@ client/                    # React 18 + Vite + Tailwind CSS
 │       ├── MainImagePanel   # flex-1: upload / preview (主图优先)
 │       ├── CategoryTabs     # 头饰 / 妆容 / 造型 / 衣物
 │       ├── ItemGrid         # max-h ~22vh, 4-col yellow tiles
-│       └── ResultView       # before / after + reset
+│       └── ResultView       # before/after, debut score + role, share caption, reset
 
 server/                    # Express + Multer + Replicate
 ├── index.js               # trust proxy; static /uploads; routes
 ├── routes/
-│   ├── debut.js           # POST /api/debut — multer + prompt + Replicate or mock copy
+│   ├── debut.js           # POST /api/debut — multer + prompt + Replicate or mock copy; returns debutScore / tier / role
 │   ├── generate.js        # @deprecated POST /api/generate
 │   └── score.js           # @deprecated POST /api/score
 └── services/
     ├── debutPrompt.js     # buildDebutPrompt(selections) from catalog
+    ├── debutScore.js      # scoreSelections → 0–100 + tier (rule-based)
+    ├── debutRolePick.js   # pickRole(tierId, selections) from debutRoles.json
+    ├── debutOutcome.js    # computeDebutOutcome(selections) for API payload
     ├── replicateDebut.js  # runGptImage2 → Buffer
     ├── promptBuilder.js   # legacy style prompts
     ├── imageGen.js
@@ -63,7 +67,7 @@ server/                    # Express + Multer + Replicate
 
 - **No database** — uploads and outputs in `server/uploads/`.
 - **Shared catalog** — `catalog/itemCatalog.json` is imported on the client via `@catalog` alias and read on the server from disk for prompt building.
-- **Mock debut** — If `REPLICATE_API_TOKEN` is empty, `/api/debut` copies the uploaded file to a new name and returns it so the UI can be tested without Replicate.
+- **Mock debut** — If `REPLICATE_API_TOKEN` is empty, `/api/debut` copies the uploaded file to a new name and returns it so the UI can be tested without Replicate. Successful responses (mock or real) also include **`debutScore`**, **`debutTierId`**, **`debutTierLabel`**, **`debutRole`** `{ title, tagline, emoji }` from `computeDebutOutcome(selections)`.
 - **Real Replicate** — Requires `REPLICATE_API_TOKEN` and **`PUBLIC_BASE_URL`** (HTTPS in production) so `input_images` URLs are reachable by Replicate’s servers (not `http://localhost:3001`).
 - **Vite proxy** — `/api/*` and `/uploads/*` proxied to Express in dev.
 

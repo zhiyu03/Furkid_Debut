@@ -5,6 +5,7 @@ import fs from 'fs'
 import { randomUUID } from 'crypto'
 import { fileURLToPath } from 'url'
 import { buildDebutPrompt } from '../services/debutPrompt.js'
+import { computeDebutOutcome } from '../services/debutOutcome.js'
 import { runGptImage2 } from '../services/replicateDebut.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -82,6 +83,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 
     const prompt = buildDebutPrompt(selections)
+    const debutMeta = computeDebutOutcome(selections)
     const filename = req.file.filename
     const baseUrl = resolvePublicBaseUrl(req)
     const token = (process.env.REPLICATE_API_TOKEN || '').trim()
@@ -95,6 +97,7 @@ router.post('/', upload.single('image'), async (req, res) => {
         resultImage: `/uploads/${outName}`,
         mock: true,
         message: '未配置 REPLICATE_API_TOKEN，已返回本地拷贝（联调 UI 用）',
+        ...debutMeta,
       })
     }
 
@@ -121,10 +124,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     res.json({
       resultImage: `/uploads/${outName}`,
       mock: false,
+      ...debutMeta,
     })
   } catch (err) {
     console.error('Debut error:', err)
-    res.status(500).json({ error: err.message || '变装失败' })
+    res.status(500).json({ error: err.message || '出道定妆失败' })
   }
 })
 

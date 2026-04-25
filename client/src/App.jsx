@@ -27,6 +27,7 @@ export default function App() {
   const [selections, setSelections] = useState([])
   const [activeCategory, setActiveCategory] = useState(DEFAULT_CATEGORY)
   const [resultImage, setResultImage] = useState(null)
+  const [debutOutcome, setDebutOutcome] = useState(null)
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
 
@@ -76,6 +77,16 @@ export default function App() {
         throw new Error(data.error || `请求失败 (${res.status})`)
       }
       setResultImage(data.resultImage)
+      if (typeof data.debutScore === 'number' && data.debutRole) {
+        setDebutOutcome({
+          debutScore: data.debutScore,
+          debutTierId: data.debutTierId,
+          debutTierLabel: data.debutTierLabel,
+          debutRole: data.debutRole,
+        })
+      } else {
+        setDebutOutcome(null)
+      }
       if (data.mock && data.message) setInfo(data.message)
       setStep(STEPS.RESULT)
     } catch (err) {
@@ -91,6 +102,7 @@ export default function App() {
     setSelections([])
     setActiveCategory(DEFAULT_CATEGORY)
     setResultImage(null)
+    setDebutOutcome(null)
     setError(null)
     setInfo(null)
   }
@@ -156,14 +168,19 @@ export default function App() {
           <div className="h-14 w-14 animate-spin rounded-full border-4 border-brand border-t-transparent" />
           <p className="text-center text-sm text-gray-600">正在为你的毛孩子打光、定妆…</p>
           <p className="max-w-[18rem] text-center text-xs leading-relaxed text-gray-400">
-            云端排队中，定妆出图可能要几十秒到几分钟。上传前已自动压缩大图。
+            云端排队中，定妆出图可能要几十秒到几分钟。
           </p>
         </div>
       )}
 
       {step === STEPS.RESULT && imagePreview && resultImage && (
         <div className="flex min-h-0 flex-1 flex-col">
-          <ResultView original={imagePreview} result={resultImage} onReset={handleReset} />
+          <ResultView
+            original={imagePreview}
+            result={resultImage}
+            debutOutcome={debutOutcome}
+            onReset={handleReset}
+          />
         </div>
       )}
     </MobileShell>

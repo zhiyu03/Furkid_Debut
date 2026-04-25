@@ -24,7 +24,7 @@ npm run dev
 ## 功能概要
 
 - 手机宽度外壳（约 430px）：左侧约 1/3 宠物主图，右侧四类（头饰 / 妆容 / 造型 / 衣物），点入子面板选图标；已选显示在主图下方条带，可点掉。
-- **开始变装** → `POST /api/debut`：服务端按选项拼英文 prompt，调用 **Replicate `openai/gpt-image-2`**；未配置 Token 时返回上传图拷贝便于联调 UI。
+- **生成出道定妆** → `POST /api/debut`：按选项拼英文 prompt 调 **Replicate `openai/gpt-image-2`**；同响应内带规则向 **出道潜力分**、档位与 **出道角色**（`debutScore`、`debutTierLabel`、`debutRole`）。未配置 Token 时返回上传图拷贝便于联调 UI。
 
 ## Tech Stack
 
