@@ -3,8 +3,6 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import generateRouter from './routes/generate.js'
-import scoreRouter from './routes/score.js'
 import debutRouter from './routes/debut.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -21,10 +19,6 @@ app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.use('/api/debut', debutRouter)
-/** @deprecated 旧版风格变身，改用 /api/debut */
-app.use('/api/generate', generateRouter)
-/** @deprecated */
-app.use('/api/score', scoreRouter)
 
 const PORT = process.env.PORT || 3001
 

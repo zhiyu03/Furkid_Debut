@@ -17,18 +17,23 @@ export default function SelectedSidebar({ selections, onRemove }) {
           const meta = lookup(s.categoryId, s.itemId)
           const catName = catalog.categories.find((c) => c.id === s.categoryId)?.name ?? ''
           return (
-            <button
+            <div
               key={`${s.categoryId}-${s.itemId}-${index}`}
-              type="button"
-              aria-label={`移除 ${meta.label}`}
-              onClick={() => onRemove(index)}
-              className="rounded-lg bg-blue-500 px-2 py-2 text-left text-[9px] leading-tight text-white shadow-sm active:scale-[0.98]"
+              className="relative rounded-lg bg-blue-500 px-2 py-2 text-left text-[9px] leading-tight text-white shadow-sm"
             >
+              <button
+                type="button"
+                aria-label={`移除 ${meta.label}`}
+                onClick={() => onRemove(s.categoryId, s.itemId)}
+                className="absolute right-1 top-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-[10px] font-bold text-white hover:bg-white/30 active:scale-95"
+              >
+                ×
+              </button>
               <span className="text-base leading-none">{meta.emoji}</span>
-              <div className="mt-0.5 font-semibold">
+              <div className="mt-0.5 pr-4 font-semibold">
                 {catName}·{meta.label}
               </div>
-            </button>
+            </div>
           )
         })
       )}

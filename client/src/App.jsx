@@ -132,7 +132,11 @@ export default function App() {
           <div className="flex min-h-[38vh] flex-1 basis-0 gap-2 overflow-hidden rounded-xl bg-zinc-200/90 p-2">
             <SelectedSidebar
               selections={selections}
-              onRemove={(index) => setSelections((s) => s.filter((_, i) => i !== index))}
+              onRemove={(categoryId, itemId) =>
+                setSelections((prev) =>
+                  prev.filter((s) => !(s.categoryId === categoryId && s.itemId === itemId))
+                )
+              }
             />
             <MainImagePanel previewUrl={imagePreview} onImageSelected={handleImageSelected} />
           </div>
