@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react'
 import catalog from '@catalog/itemCatalog.json'
 import { downscaleImageFile } from './utils/downscaleImage'
 import MobileShell from './components/mobile/MobileShell'
-import PetColumn from './components/mobile/PetColumn'
-import CategoryRail from './components/mobile/CategoryRail'
-import CategoryPanel from './components/mobile/CategoryPanel'
+import SelectedSidebar from './components/mobile/SelectedSidebar'
+import MainImagePanel from './components/mobile/MainImagePanel'
+import CategoryTabs from './components/mobile/CategoryTabs'
+import ItemGrid from './components/mobile/ItemGrid'
 import ResultView from './components/mobile/ResultView'
 
 const STEPS = { DRESS: 'dress', GENERATING: 'generating', RESULT: 'result' }
+
+const DEFAULT_CATEGORY = catalog.categories[0]?.id ?? 'headwear'
 
 function buildCategoryList() {
   return catalog.categories.map((c) => ({
@@ -22,15 +25,10 @@ export default function App() {
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [selections, setSelections] = useState([])
-  const [activeCategory, setActiveCategory] = useState(null)
+  const [activeCategory, setActiveCategory] = useState(DEFAULT_CATEGORY)
   const [resultImage, setResultImage] = useState(null)
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
-
-  const activePanel = useMemo(
-    () => categories.find((c) => c.id === activeCategory) || null,
-    [activeCategory, categories],
-  )
 
   const handleImageSelected = (file, preview) => {
     setImageFile(file)
@@ -55,7 +53,6 @@ export default function App() {
       }
       return [...prev, { categoryId, itemId }]
     })
-    setActiveCategory(null)
   }
 
   const handleDebut = async () => {
@@ -92,65 +89,74 @@ export default function App() {
     setImageFile(null)
     setImagePreview(null)
     setSelections([])
-    setActiveCategory(null)
+    setActiveCategory(DEFAULT_CATEGORY)
     setResultImage(null)
     setError(null)
     setInfo(null)
   }
 
+  const activeCategoryLabel = categories.find((c) => c.id === activeCategory)?.name ?? ''
+  const gridItems = catalog.items[activeCategory] || []
+
   return (
     <MobileShell>
-      <header className="mb-3 text-center">
-        <h1 className="text-xl font-extrabold tracking-tight text-brand drop-shadow-sm">毛孩子出道计划</h1>
-        <p className="text-xs text-gray-500">造型 · 妆容 · 饰品一键合成</p>
+      <header className="shrink-0 py-1 text-center">
+        <h1 className="text-lg font-extrabold tracking-tight text-brand drop-shadow-sm">毛孩子出道计划</h1>
       </header>
 
       {error && (
-        <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>
+        <div className="mb-1 shrink-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+          {error}
+        </div>
       )}
       {info && step === STEPS.RESULT && (
-        <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">{info}</div>
+        <div className="mb-1 shrink-0 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] text-amber-900">
+          {info}
+        </div>
       )}
 
       {step === STEPS.DRESS && (
-        <>
-          <div className="flex min-h-[52vh] flex-1 flex-row gap-2">
-            <PetColumn
-              previewUrl={imagePreview}
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden">
+          <div className="flex min-h-[38vh] flex-1 basis-0 gap-2 overflow-hidden rounded-xl bg-zinc-200/90 p-2">
+            <SelectedSidebar
               selections={selections}
-              onRemoveSelection={(index) =>
-                setSelections((s) => s.filter((_, i) => i !== index))
-              }
-              onImageSelected={handleImageSelected}
+              onRemove={(index) => setSelections((s) => s.filter((_, i) => i !== index))}
             />
-            <CategoryRail categories={catalog.categories} onOpen={setActiveCategory} />
+            <MainImagePanel previewUrl={imagePreview} onImageSelected={handleImageSelected} />
           </div>
 
-          {activePanel && (
-            <CategoryPanel
-              category={activePanel}
-              onPick={toggleSelection}
-              onClose={() => setActiveCategory(null)}
-            />
-          )}
+          <CategoryTabs
+            categories={catalog.categories}
+            activeId={activeCategory}
+            onChange={setActiveCategory}
+          />
+
+          <ItemGrid
+            categoryLabel={activeCategoryLabel}
+            items={gridItems}
+            isSelected={(itemId) =>
+              selections.some((s) => s.categoryId === activeCategory && s.itemId === itemId)
+            }
+            onToggle={(itemId) => toggleSelection(activeCategory, itemId)}
+          />
 
           <button
             type="button"
             disabled={!imageFile}
             onClick={handleDebut}
-            className="mt-auto w-full rounded-full bg-brand py-3.5 text-center text-base font-bold text-white shadow-lg transition enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-1 shrink-0 rounded-full bg-brand py-3 text-center text-sm font-bold text-white shadow-lg transition enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
             开始变装
           </button>
-        </>
+        </div>
       )}
 
       {step === STEPS.GENERATING && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
           <div className="h-14 w-14 animate-spin rounded-full border-4 border-brand border-t-transparent" />
           <p className="text-center text-sm text-gray-600">AI 正在合成中，请稍候…</p>
           <p className="max-w-[18rem] text-center text-xs leading-relaxed text-gray-400">
-            云端排队 + 出图常需数十秒至数分钟，与模型负载有关。上传前已自动压缩大图以略减耗时。
+            云端排队 + 出图常需数十秒至数分钟。上传前已自动压缩大图。
           </p>
         </div>
       )}

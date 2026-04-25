@@ -38,12 +38,12 @@ client/                    # React 18 + Vite + Tailwind CSS
 ├── src/
 │   ├── App.jsx            # dress → generating → result; selections + /api/debut
 │   └── components/mobile/
-│       ├── MobileShell    # max-w 430px, safe-area
-│       ├── PetColumn      # ~1/3 width: image + selected strip
-│       ├── CategoryRail   # four category buttons (~2/3 width column)
-│       ├── CategoryPanel  # bottom sheet / overlay icon grid
-│       ├── SelectedStrip  # chips under pet image
-│       └── ResultView     # before / after + reset
+│       ├── MobileShell      # max-w 430px, 100dvh, overflow hidden
+│       ├── SelectedSidebar  # ~34% width: vertical selected chips
+│       ├── MainImagePanel   # flex-1: upload / preview (主图优先)
+│       ├── CategoryTabs     # 头饰 / 妆容 / 造型 / 衣物
+│       ├── ItemGrid         # max-h ~22vh, 4-col yellow tiles
+│       └── ResultView       # before / after + reset
 
 server/                    # Express + Multer + Replicate
 ├── index.js               # trust proxy; static /uploads; routes
