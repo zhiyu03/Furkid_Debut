@@ -162,7 +162,9 @@ export default function App() {
       )}
 
       {step === STEPS.RESULT && imagePreview && resultImage && (
-        <ResultView original={imagePreview} result={resultImage} onReset={handleReset} />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <ResultView original={imagePreview} result={resultImage} onReset={handleReset} />
+        </div>
       )}
     </MobileShell>
   )
