@@ -79,7 +79,7 @@ export default function App() {
       if (data.mock && data.message) setInfo(data.message)
       setStep(STEPS.RESULT)
     } catch (err) {
-      setError(err.message || '变装失败')
+      setError(err.message || '出道定妆失败，请重试')
       setStep(STEPS.DRESS)
     }
   }
@@ -146,7 +146,7 @@ export default function App() {
             onClick={handleDebut}
             className="mt-1 shrink-0 rounded-full bg-brand py-3 text-center text-sm font-bold text-white shadow-lg transition enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            开始变装
+            生成出道定妆
           </button>
         </div>
       )}
@@ -154,9 +154,9 @@ export default function App() {
       {step === STEPS.GENERATING && (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
           <div className="h-14 w-14 animate-spin rounded-full border-4 border-brand border-t-transparent" />
-          <p className="text-center text-sm text-gray-600">AI 正在合成中，请稍候…</p>
+          <p className="text-center text-sm text-gray-600">正在为你的毛孩子打光、定妆…</p>
           <p className="max-w-[18rem] text-center text-xs leading-relaxed text-gray-400">
-            云端排队 + 出图常需数十秒至数分钟。上传前已自动压缩大图。
+            云端排队中，定妆出图可能要几十秒到几分钟。上传前已自动压缩大图。
           </p>
         </div>
       )}

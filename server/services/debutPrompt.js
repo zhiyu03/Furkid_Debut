@@ -33,14 +33,15 @@ export function buildDebutPrompt(selections) {
 
   const stylingBlock =
     lines.length > 0
-      ? `Apply the following as one cohesive cute pet makeover:\n${lines.join('\n')}`
-      : 'Enhance the pet photo with a subtle polished studio-ready look (no drastic identity change).'
+      ? `Apply the following as one cohesive debut-ready pet look (spotlight polish for a reveal moment, not a generic beauty filter):\n${lines.join('\n')}`
+      : 'Enhance the pet photo with subtle debut-poster polish: studio key light, depth, and fur detail (no drastic identity change).'
 
   return [
     'Keep the same pet species, identity, and overall pose from the input photo.',
     'Photorealistic lighting, soft shadows, high detail fur texture.',
+    'Creative direction: vertical short-form cover or K-pop-style debut teaser still—gentle spotlight and rim light, stage-ready portrait mood; stay photorealistic, avoid full cartoon or illustration.',
     stylingBlock,
-    'Vertical composition friendly for mobile screens.',
+    'Vertical composition for mobile screens, with a modest clean band of negative space (top or bottom) suitable for optional captions later—do not render any text, letters, logos, or watermarks in the image.',
   ].join(' ')
 }
 
