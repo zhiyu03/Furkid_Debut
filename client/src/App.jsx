@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import catalog from '@catalog/itemCatalog.json'
 import { downscaleImageFile } from './utils/downscaleImage'
 import MobileShell from './components/mobile/MobileShell'
@@ -30,6 +30,33 @@ export default function App() {
   const [debutOutcome, setDebutOutcome] = useState(null)
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
+  const [genProgress, setGenProgress] = useState(0)
+  const [genFastDurationMs, setGenFastDurationMs] = useState(20000)
+  const [genStartAt, setGenStartAt] = useState(0)
+
+  useEffect(() => {
+    if (step !== STEPS.GENERATING || !genStartAt) return undefined
+
+    const timer = window.setInterval(() => {
+      const now = Date.now()
+      const elapsed = now - genStartAt
+      let target = 0
+
+      if (elapsed <= genFastDurationMs) {
+        // 前 80%：在随机时长内快速推进，给用户明显的“进展感”
+        target = (elapsed / genFastDurationMs) * 80
+      } else {
+        // 后 20%：进入慢速尾段，等待真实结果返回
+        const slowElapsed = elapsed - genFastDurationMs
+        target = 80 + 20 * (1 - Math.exp(-slowElapsed / 45000))
+      }
+
+      const capped = Math.min(99, target)
+      setGenProgress((prev) => (capped > prev ? capped : prev))
+    }, 120)
+
+    return () => window.clearInterval(timer)
+  }, [step, genStartAt, genFastDurationMs])
 
   const handleImageSelected = (file, preview) => {
     setImageFile(file)
@@ -63,6 +90,10 @@ export default function App() {
     }
     setError(null)
     setInfo(null)
+    const fastDuration = Math.floor(10000 + Math.random() * 20000) // 10s - 30s
+    setGenFastDurationMs(fastDuration)
+    setGenProgress(0)
+    setGenStartAt(Date.now())
     setStep(STEPS.GENERATING)
 
     const formData = new FormData()
@@ -88,9 +119,12 @@ export default function App() {
         setDebutOutcome(null)
       }
       if (data.mock && data.message) setInfo(data.message)
+      setGenProgress(100)
+      await new Promise((resolve) => window.setTimeout(resolve, 260))
       setStep(STEPS.RESULT)
     } catch (err) {
       setError(err.message || '出道定妆失败，请重试')
+      setGenProgress(0)
       setStep(STEPS.DRESS)
     }
   }
@@ -105,6 +139,8 @@ export default function App() {
     setDebutOutcome(null)
     setError(null)
     setInfo(null)
+    setGenProgress(0)
+    setGenStartAt(0)
   }
 
   const activeCategoryLabel = categories.find((c) => c.id === activeCategory)?.name ?? ''
@@ -169,10 +205,21 @@ export default function App() {
 
       {step === STEPS.GENERATING && (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
-          <div className="h-14 w-14 animate-spin rounded-full border-4 border-brand border-t-transparent" />
+          <div className="w-full max-w-[19rem]">
+            <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
+              <span>正在生成中</span>
+              <span className="font-semibold text-brand">{Math.floor(genProgress)}%</span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-rose-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-rose-400 via-pink-500 to-brand transition-[width] duration-300"
+                style={{ width: `${genProgress}%` }}
+              />
+            </div>
+          </div>
           <p className="text-center text-sm text-gray-600">正在为你的毛孩子打光、定妆…</p>
           <p className="max-w-[18rem] text-center text-xs leading-relaxed text-gray-400">
-            云端排队中，定妆出图可能要几十秒到几分钟。
+            前期会快速生成预览进度，最终出图以云端真实完成为准。
           </p>
         </div>
       )}

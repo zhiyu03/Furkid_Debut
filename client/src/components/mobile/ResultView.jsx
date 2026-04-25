@@ -120,7 +120,7 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
       {/* 单页滚动：大图、Tab、分数卡顺序向下，一起上移，无层叠 */}
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div className="space-y-3 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
-          <div className="flex w-full justify-center">
+          <div className="flex w-full items-center justify-center">
             <div className="relative inline-block max-w-full rounded-2xl bg-zinc-100 shadow-inner ring-1 ring-gray-200/80">
               <img
                 src={heroSrc}
@@ -128,7 +128,24 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
                 className="block max-h-[min(58vh,540px)] w-auto max-w-full rounded-2xl align-top"
                 decoding="async"
               />
-              <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+              {hasScore && mode === 'result' && (
+                <>
+                  <div className="pointer-events-none absolute left-2 top-2 rounded-full bg-black/45 px-2.5 py-1 text-white backdrop-blur-sm">
+                    <p className="text-[9px] font-semibold leading-none text-white/90">出道分</p>
+                    <p className="mt-0.5 text-base font-black leading-none">{score}</p>
+                  </div>
+                  <div className="pointer-events-none absolute right-2 top-2 flex items-center gap-1.5">
+                    <span className="rounded-full bg-black/45 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                      {tierLabel}
+                    </span>
+                    <span className="rounded-full bg-black/45 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                      {role.emoji}
+                      {role.title}
+                    </span>
+                  </div>
+                </>
+              )}
+              <span className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
                 当前 · {modeLabel}
               </span>
             </div>
@@ -168,41 +185,13 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
           </div>
 
           {hasScore && (
-            <div
-              className="relative z-0"
+            <p
+              className="rounded-lg bg-violet-50/70 px-2 py-1.5 text-center text-sm font-semibold leading-snug text-violet-900"
               aria-label={`出道潜力指数 ${score} 分，档位 ${tierLabel}，角色 ${role.title}`}
             >
-              <div className="rounded-xl border border-violet-100 bg-gradient-to-br from-violet-50/90 to-fuchsia-50/80 px-3 py-2.5 shadow-sm">
-                <div className="flex items-end justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-800/80">
-                      出道潜力指数
-                    </p>
-                    <p className="text-2xl font-black tabular-nums text-violet-950">{score}</p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-violet-900 ring-1 ring-violet-200">
-                    {tierLabel}
-                  </span>
-                </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/70">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all"
-                    style={{ width: `${score}%` }}
-                  />
-                </div>
-                <div className="mt-3 rounded-lg border border-white/60 bg-white/50 px-2.5 py-2">
-                  <p className="text-[10px] font-semibold text-gray-500">今日出道人设</p>
-                  <p className="mt-0.5 text-sm font-extrabold text-gray-900">
-                    <span className="mr-1">{role.emoji}</span>
-                    {role.title}
-                  </p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-gray-600">{role.tagline}</p>
-                </div>
-                <p className="mt-2 text-[9px] leading-relaxed text-gray-400">
-                  娱乐向规则评分，根据你的装扮选择计算，非专业评审或视觉识妆。
-                </p>
-              </div>
-            </div>
+              今日人设：{role.emoji}
+              {role.title} · {role.tagline}
+            </p>
           )}
 
           <div className="grid grid-cols-2 gap-2">
