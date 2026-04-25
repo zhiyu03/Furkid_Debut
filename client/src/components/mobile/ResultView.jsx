@@ -1,15 +1,61 @@
 import { useMemo, useState } from 'react'
 
-const SHARE_FALLBACK =
-  '我家毛孩子今天 C 位出道！快来围观～\n#毛孩子出道计划 #萌宠出道 #宠物变装 #抖音萌宠'
+const SHARE_TAGS = '#毛孩子出道计划 #出道潜力分 #萌宠出道 #抖音萌宠'
+
+const SHARE_FALLBACK = `我家毛孩子今天先出道为敬，围观请自带小鱼干～\n${SHARE_TAGS}`
 
 /**
- * @param {{ debutScore: number, debutTierLabel: string, debutRole: { title: string, tagline: string, emoji: string } }} o
+ * @param {{ debutScore: number, debutTierId?: string, debutTierLabel: string, debutRole: { title: string, tagline: string, emoji: string } }} o
  */
 export function buildDebutShareCaption(o) {
   if (!o || typeof o.debutScore !== 'number' || !o.debutRole?.title) return SHARE_FALLBACK
+  const score = Math.round(o.debutScore)
+  const tierLabel = o.debutTierLabel || '神秘段位'
+  const tierKey = o.debutTierId || ''
   const { emoji, title, tagline } = o.debutRole
-  return `我家毛孩子出道潜力${o.debutScore}分（${o.debutTierLabel}）——今日人设：${emoji}${title}！${tagline}\n#毛孩子出道计划 #出道潜力分 #萌宠出道 #抖音萌宠`
+
+  const pick = (arr, salt = 0) => arr[(score + salt + title.length) % arr.length]
+
+  const mains = [
+    `救命，潜力${score}分「${tierLabel}」这也太会了：${emoji}${title}，${tagline}`,
+    `我家毛孩子潜力${score}（${tierLabel}）——${emoji}${title}现场直拍：${tagline}`,
+    `抽查抖音潜力股：${score}分，段位${tierLabel}。${emoji}${title}：${tagline}`,
+    `不是滤镜，是硬可爱：潜力${score}「${tierLabel}」${emoji}${title}，${tagline}`,
+    `先报分数再报梗：${score}分（${tierLabel}）${emoji}${title}，${tagline}`,
+    `潜力${score}分「${tierLabel}」已写脸上，${emoji}${title}：${tagline}`,
+  ]
+
+  const zingers = [
+    '看完别装路人，下一个爆款预定就是我家的。',
+    '评论区留给各位「影帝影后」的毛孩子，我先笑为敬。',
+    '声明：本条含猫/狗量超标，刷到算你赚到。',
+    '饭可以加，C 位也可以让，可爱这块我家先锁了。',
+    '热搜有没有我不知道，反正村口大喇叭已经在我脑子里响了。',
+    '建议立刻点赞收藏，不然算法以为你不爱看可爱的（那多可惜）。',
+    '发完这条我去给主子加鸡腿：孩子半场开香槟，我先开为敬。',
+    '别问怎么养的，问就是天生吃这碗饭，别的不会就会萌。',
+  ]
+
+  const tierZing = {
+    trainee: ['练习生籍籍无名但戏很足，先混个脸熟。', '还在实习期，主打一个「明天一定努力」。'],
+    backup: ['预备役也是役，认真起来我自己都怕。', '离 C 位还差一口气（和三条小鱼干）。'],
+    rising: ['上升期新人，主打一个潜力股「先上车再补票」。', '热搜词条我都想好了，就差本人点头。'],
+    center: ['准 C 位，九宫格中间帮我留个坑谢谢。', '直拍万转那种，滤镜麻烦先开最大。'],
+    diva: ['本番出道，闪光灯自便，我先闪了（物理）。', '顶流体验券已核销，请各位让让镜头。'],
+  }
+  const tierLines = tierZing[tierKey] || tierZing.trainee
+  const tierLine = pick(tierLines, tierKey.length)
+
+  const main = pick(mains, hashStr(tierKey))
+  const zing = pick(zingers, hashStr(title))
+
+  return `${main}\n${tierLine}\n${zing}\n\n${SHARE_TAGS}`
+}
+
+function hashStr(s) {
+  let h = 0
+  for (let i = 0; i < s.length; i += 1) h = (h * 33 + s.charCodeAt(i)) >>> 0
+  return h
 }
 
 /**
@@ -130,22 +176,24 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
               />
               {hasScore && mode === 'result' && (
                 <>
-                  <div className="pointer-events-none absolute left-2 top-2 rounded-full bg-black/45 px-2.5 py-1 text-white backdrop-blur-sm">
-                    <p className="text-[9px] font-semibold leading-none text-white/90">出道分</p>
-                    <p className="mt-0.5 text-base font-black leading-none">{score}</p>
+                  <div className="pointer-events-none absolute left-2 top-2 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 px-2.5 py-1.5 text-white shadow-lg ring-2 ring-white/50">
+                    <p className="text-[8px] font-bold tracking-wide text-white/90">出道分</p>
+                    <p className="mt-0.5 text-center text-lg font-black tabular-nums leading-none tracking-tight">{score}</p>
                   </div>
-                  <div className="pointer-events-none absolute right-2 top-2 flex items-center gap-1.5">
-                    <span className="rounded-full bg-black/45 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                  <div className="pointer-events-none absolute right-2 top-2 flex max-w-[58%] flex-col items-end gap-1">
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-extrabold text-white shadow-md ring-1 ring-white/40">
                       {tierLabel}
                     </span>
-                    <span className="rounded-full bg-black/45 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
-                      {role.emoji}
-                      {role.title}
+                    <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1 text-[10px] font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
+                      <span className="shrink-0 text-[13px] leading-none" aria-hidden>
+                        {role.emoji}
+                      </span>
+                      <span className="min-w-0 truncate">{role.title}</span>
                     </span>
                   </div>
                 </>
               )}
-              <span className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+              <span className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-full border border-white/25 bg-zinc-900/55 px-2.5 py-1 text-[10px] font-bold text-white shadow-md backdrop-blur-sm">
                 当前 · {modeLabel}
               </span>
             </div>
@@ -205,8 +253,8 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
               <span className="block bg-slate-50 py-1 text-center text-[10px] font-semibold text-slate-600">
                 素人毛孩
               </span>
-              <div className="aspect-[5/3] w-full overflow-hidden bg-slate-200">
-                <img src={original} alt="" className="h-full w-full object-cover" />
+              <div className="relative flex h-[min(34vh,240px)] w-full items-center justify-center overflow-hidden bg-slate-200">
+                <img src={original} alt="" className="max-h-full max-w-full object-contain" />
               </div>
             </button>
             <button
@@ -219,8 +267,8 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
               <span className="block bg-rose-50 py-1 text-center text-[10px] font-semibold text-rose-800">
                 出道定妆
               </span>
-              <div className="aspect-[5/3] w-full overflow-hidden bg-rose-100">
-                <img src={result} alt="" className="h-full w-full object-cover" />
+              <div className="relative flex h-[min(34vh,240px)] w-full items-center justify-center overflow-hidden bg-rose-100">
+                <img src={result} alt="" className="max-h-full max-w-full object-contain" />
               </div>
             </button>
           </div>
@@ -276,7 +324,7 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
                   <img
                     src={result}
                     alt="分享卡片预览"
-                    className="h-auto max-h-[36vh] w-full rounded-2xl object-cover"
+                    className="max-h-[36vh] w-full rounded-2xl object-contain bg-zinc-100"
                   />
                   <p className="mt-1.5 text-center text-xs font-extrabold text-zinc-900">{shareTitle}</p>
                   <p className="mt-0.5 text-center text-[10px] text-zinc-500">{shareSubtitle}</p>
