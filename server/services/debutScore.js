@@ -1,10 +1,3 @@
-/**
- * 出道潜力分（双轨）
- * - rawScore：规则原始分，用于内部区分度与映射区间
- * - displayScore（API 字段 debutScore）：映射到 80–100，满足「最低 80」展示需求
- * 档位与角色池仍用 tierId，现按 displayScore 分档（与对外分数一致）
- */
-
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -12,144 +5,121 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const catalogPath = path.join(__dirname, '../../catalog/itemCatalog.json')
 
-const CATEGORY_BASE = {
-  makeup: 12,
-  headwear: 10,
-  styling: 10,
-  clothing: 14,
+// Style distance matrix: 0 = identical vibe, 1 = completely clashing
+// 甜美↔元气 close, 贵气↔慵懒 close, 甜酷 isolated, 霸总 far from all
+const STYLE_DIST = {
+  sweet:               { sweet: 0,   'daily-energy': 0.2, 'street-sweet-cool': 0.4, 'gentle-lazy': 0.5, luxury: 0.6, boss: 0.9 },
+  'daily-energy':      { sweet: 0.2, 'daily-energy': 0,   'street-sweet-cool': 0.3, 'gentle-lazy': 0.4, luxury: 0.7, boss: 0.8 },
+  'street-sweet-cool': { sweet: 0.4, 'daily-energy': 0.3, 'street-sweet-cool': 0,   'gentle-lazy': 0.6, luxury: 0.5, boss: 0.7 },
+  'gentle-lazy':       { sweet: 0.5, 'daily-energy': 0.4, 'street-sweet-cool': 0.6, 'gentle-lazy': 0,   luxury: 0.2, boss: 0.8 },
+  luxury:              { sweet: 0.6, 'daily-energy': 0.7, 'street-sweet-cool': 0.5, 'gentle-lazy': 0.2, luxury: 0,   boss: 0.7 },
+  boss:                { sweet: 0.9, 'daily-energy': 0.8, 'street-sweet-cool': 0.7, 'gentle-lazy': 0.8, luxury: 0.7, boss: 0 },
 }
 
-const ALL_CATEGORIES = ['headwear', 'makeup', 'styling', 'clothing']
-
-/** 对外展示分区间 */
-const DISPLAY_MIN = 80
-const DISPLAY_MAX = 100
-
-/** 按展示分（80–100）分档，tier id 与 debutRoles.json 对齐 */
-const TIER_BANDS_DISPLAY = [
-  { max: 82, id: 'trainee', label: '练习生' },
-  { max: 86, id: 'backup', label: '预备役' },
-  { max: 90, id: 'rising', label: '上升期新人' },
-  { max: 94, id: 'center', label: '准 C 位' },
+const TIER_BANDS = [
+  { max: 59, id: 'trainee', label: '练习生' },
+  { max: 69, id: 'backup', label: '预备役' },
+  { max: 79, id: 'rising', label: '上升期新人' },
+  { max: 89, id: 'center', label: '准 C 位' },
   { max: 100, id: 'diva', label: '本番出道' },
 ]
 
-const DEFAULT_ITEM_SCORE = 8
-
-function loadCatalogLimits() {
-  const raw = fs.readFileSync(catalogPath, 'utf8')
-  const doc = JSON.parse(raw)
-  const maxPer = doc.maxPerCategory || {}
-  const limits = {}
-  for (const c of ALL_CATEGORIES) {
-    limits[c] = Math.max(0, Number(maxPer[c]) || 0)
-  }
-  return limits
-}
-
-/**
- * 在给定每类件数上限下，规则能达到的理论 raw 区间（用于展示分映射）
- */
-export function computeRawScoreRange() {
-  const limits = loadCatalogLimits()
-  let rawMax = 0
-
-  for (const c of ALL_CATEGORIES) {
-    const n = limits[c]
-    const base = CATEGORY_BASE[c]
-    if (base !== undefined && n > 0) rawMax += base * n
-  }
-  const maxMakeup = limits.makeup
-  const allFourReachable = ALL_CATEGORIES.every((c) => limits[c] >= 1)
-  if (allFourReachable) rawMax += 10
-  if (maxMakeup >= 2) rawMax += 5
-  if (maxMakeup >= 3) rawMax += 3
-
-  /**
-   * 展示分映射下沿固定为 15：与 `scoreSelections` 中空选择的兜底 raw 对齐，
-   * 使「未选」稳定落在展示分 80，任意有效加分从 80 起单调上升。
-   */
-  const rawMin = 15
-
-  return { rawMin, rawMax, limits }
+let cached = null
+function loadCatalog() {
+  if (cached) return cached
+  cached = JSON.parse(fs.readFileSync(catalogPath, 'utf8'))
+  return cached
 }
 
 /**
  * @param {{ categoryId: string, itemId: string }[]} selections
- * @returns {{ rawScore: number, score: number, tierId: string, tierLabel: string }}
- * `score` 为对外展示分（80–100），与历史字段名一致供 computeDebutOutcome 使用
+ * @returns {{ score: number, tierId: string, tierLabel: string, primaryLookId: string|null }}
  */
 export function scoreSelections(selections) {
+  const catalog = loadCatalog()
+  const looks = catalog.recommendedLooks || []
   const list = Array.isArray(selections) ? selections : []
-  const limits = loadCatalogLimits()
+  const N = list.length
 
-  let raw = 0
+  if (N === 0) {
+    const { id: tierId, label: tierLabel } = tierFromScore(15)
+    return { score: 15, tierId, tierLabel, primaryLookId: null }
+  }
+
+  // Each item belongs to exactly one look (zero-overlap design)
+  const itemToLook = {}
+  const lookSizes = {}
+  for (const look of looks) {
+    lookSizes[look.id] = look.items.length
+    for (const item of look.items) {
+      itemToLook[`${item.categoryId}:${item.itemId}`] = look.id
+    }
+  }
+
+  // Count how many user selections fall into each look
+  const counts = {}
   for (const s of list) {
-    const cat = s.categoryId
-    const base = CATEGORY_BASE[cat]
-    if (base === undefined) {
-      console.warn(`[debutScore] unknown categoryId: ${cat}, using default ${DEFAULT_ITEM_SCORE}`)
-      raw += DEFAULT_ITEM_SCORE
-    } else {
-      raw += base
+    const lookId = itemToLook[`${s.categoryId}:${s.itemId}`]
+    if (lookId) counts[lookId] = (counts[lookId] || 0) + 1
+  }
+
+  // Primary look = the one with the most matched items
+  let primaryLookId = null
+  let primaryCount = 0
+  for (const [lookId, count] of Object.entries(counts)) {
+    if (count > primaryCount) {
+      primaryCount = count
+      primaryLookId = lookId
     }
   }
 
-  const byCat = {}
-  for (const c of ALL_CATEGORIES) {
-    byCat[c] = list.filter((s) => s.categoryId === c).length
+  if (!primaryLookId) {
+    const { id: tierId, label: tierLabel } = tierFromScore(20)
+    return { score: 20, tierId, tierLabel, primaryLookId: null }
   }
 
-  const hasAllFour = ALL_CATEGORIES.every((c) => byCat[c] >= 1)
-  if (hasAllFour) raw += 10
+  // --- Element Score (0-60) ---
+  // completeness: fraction of the primary look's items that user selected
+  // purity: fraction of user's total items that belong to the primary look
+  // volume: encourage picking more items
+  const primarySize = lookSizes[primaryLookId] || 1
+  const completeness = primaryCount / primarySize
+  const purity = primaryCount / N
+  const volume = Math.min(1, N / 4)
 
-  const makeupCount = byCat.makeup
-  if (makeupCount >= 2) raw += 5
-  if (makeupCount >= 3) raw += 3
+  const elementScore = (completeness * 0.4 + purity * 0.3 + volume * 0.3) * 60
 
-  let rawScore = Math.round(raw)
-  if (list.length === 0) {
-    rawScore = Math.max(rawScore, 15)
-  }
-  rawScore = Math.max(0, Math.min(1000, rawScore))
+  // --- Style Consistency Score (0-40) ---
+  let styleScore = 40
+  const activeLooks = Object.keys(counts)
 
-  const { rawMin, rawMax } = computeRawScoreRange()
-  const lo = rawMin
-  const hi = Math.max(lo, rawMax)
-  let displayScore = DISPLAY_MIN
-  if (rawScore <= lo) {
-    displayScore = DISPLAY_MIN
-  } else {
-    const denom = hi - lo
-    if (denom > 0) {
-      const t = (rawScore - lo) / denom
-      displayScore = DISPLAY_MIN + Math.round(t * (DISPLAY_MAX - DISPLAY_MIN))
-    } else {
-      displayScore = DISPLAY_MAX
+  if (activeLooks.length > 1) {
+    const distMap = STYLE_DIST[primaryLookId] || {}
+    let totalWeightedDist = 0
+    let totalWeight = 0
+
+    for (const lookId of activeLooks) {
+      if (lookId === primaryLookId) continue
+      const w = counts[lookId]
+      totalWeightedDist += w * (distMap[lookId] ?? 0.5)
+      totalWeight += w
     }
-  }
-  displayScore = Math.max(DISPLAY_MIN, Math.min(DISPLAY_MAX, displayScore))
 
-  const { id: tierId, label: tierLabel } = tierFromDisplayScore(displayScore)
-  return { rawScore, score: displayScore, tierId, tierLabel }
+    const avgDist = totalWeight > 0 ? totalWeightedDist / totalWeight : 0
+    const scatterRatio = (N - primaryCount) / N
+    styleScore = (1 - scatterRatio * avgDist) * 40
+  }
+
+  let score = Math.round(elementScore + styleScore)
+  score = Math.max(0, Math.min(100, score))
+
+  const { id: tierId, label: tierLabel } = tierFromScore(score)
+  return { score, tierId, tierLabel, primaryLookId }
 }
 
-/**
- * @param {number} displayScore 80–100
- */
-export function tierFromDisplayScore(displayScore) {
-  for (const band of TIER_BANDS_DISPLAY) {
-    if (displayScore <= band.max) {
-      return { id: band.id, label: band.label }
-    }
-  }
-  return {
-    id: TIER_BANDS_DISPLAY[TIER_BANDS_DISPLAY.length - 1].id,
-    label: TIER_BANDS_DISPLAY[TIER_BANDS_DISPLAY.length - 1].label,
-  }
-}
-
-/** @deprecated 旧接口按 0–100 raw 分档；保留导出避免外部误用时可查 */
 export function tierFromScore(score) {
-  return tierFromDisplayScore(Math.max(DISPLAY_MIN, Math.min(DISPLAY_MAX, score)))
+  for (const band of TIER_BANDS) {
+    if (score <= band.max) return { id: band.id, label: band.label }
+  }
+  return { id: TIER_BANDS[TIER_BANDS.length - 1].id, label: TIER_BANDS[TIER_BANDS.length - 1].label }
 }
