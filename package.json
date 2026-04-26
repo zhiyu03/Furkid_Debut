@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "concurrently -n server,client -c cyan,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
     "build": "npm run build --workspace=client",
+    "build:interactive-space": "npm run build --workspace=client && rm -rf interactive-space && mkdir -p interactive-space && cp -R client/dist/. interactive-space/",
     "start": "npm run start --workspace=server"
   },
   "devDependencies": {

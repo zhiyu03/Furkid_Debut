@@ -13,6 +13,7 @@ import WaitGalleryOverlay from './components/mobile/WaitGalleryOverlay'
 const STEPS = { DRESS: 'dress', GENERATING: 'generating', RESULT: 'result' }
 
 const DEFAULT_CATEGORY = catalog.categories[0]?.id ?? 'headwear'
+const MULTI_SELECT_CATEGORY_ID = 'headwear'
 
 function buildCategoryList() {
   return catalog.categories.map((c) => ({
@@ -28,6 +29,7 @@ export default function App() {
   const [step, setStep] = useState(STEPS.DRESS)
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [petName, setPetName] = useState('')
   const [selections, setSelections] = useState([])
   const [activeCategory, setActiveCategory] = useState(DEFAULT_CATEGORY)
   const [resultImage, setResultImage] = useState(null)
@@ -77,7 +79,8 @@ export default function App() {
       if (idx >= 0) {
         return prev.filter((_, i) => i !== idx)
       }
-      const max = catalog.maxPerCategory[categoryId] ?? 99
+      const max =
+        categoryId === MULTI_SELECT_CATEGORY_ID ? (catalog.maxPerCategory[categoryId] ?? 99) : 1
       const inCat = prev.filter((s) => s.categoryId === categoryId)
       if (inCat.length >= max) {
         const firstIdx = prev.findIndex((s) => s.categoryId === categoryId)
@@ -92,7 +95,18 @@ export default function App() {
 
   const applyRecommendedLook = (look) => {
     if (!look?.items?.length) return
-    setSelections(look.items)
+    const normalized = []
+    const seenSingle = new Set()
+    for (const item of look.items) {
+      if (item.categoryId === MULTI_SELECT_CATEGORY_ID) {
+        normalized.push(item)
+        continue
+      }
+      if (seenSingle.has(item.categoryId)) continue
+      seenSingle.add(item.categoryId)
+      normalized.push(item)
+    }
+    setSelections(normalized)
     setError(null)
   }
 
@@ -116,6 +130,7 @@ export default function App() {
     const uploadFile = await downscaleImageFile(imageFile, 1280, 0.88)
     formData.append('image', uploadFile)
     formData.append('selections', JSON.stringify(selections))
+    if (petName.trim()) formData.append('petName', petName.trim())
 
     try {
       const res = await fetch('/api/debut', { method: 'POST', body: formData })
@@ -153,6 +168,7 @@ export default function App() {
     setStep(STEPS.DRESS)
     setImageFile(null)
     setImagePreview(null)
+    setPetName('')
     setSelections([])
     setActiveCategory(DEFAULT_CATEGORY)
     setResultImage(null)
@@ -173,11 +189,15 @@ export default function App() {
 
   const activeCategoryLabel = categories.find((c) => c.id === activeCategory)?.name ?? ''
   const gridItems = catalog.items[activeCategory] || []
+  const displayPetName = petName.trim() || '毛孩子'
 
   return (
     <MobileShell>
       <header className="shrink-0 py-1 text-center">
         <h1 className="text-lg font-extrabold tracking-tight text-brand drop-shadow-sm">毛孩子出道计划</h1>
+        {step === STEPS.DRESS && petName.trim() && (
+          <p className="mt-0.5 text-[11px] text-zinc-500">主角：{displayPetName}</p>
+        )}
       </header>
 
       {error && (
@@ -202,7 +222,12 @@ export default function App() {
                 )
               }
             />
-            <MainImagePanel previewUrl={imagePreview} onImageSelected={handleImageSelected} />
+            <MainImagePanel
+              previewUrl={imagePreview}
+              onImageSelected={handleImageSelected}
+              petName={petName}
+              onPetNameChange={setPetName}
+            />
           </div>
 
           <CategoryTabs
