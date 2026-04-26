@@ -137,7 +137,7 @@ export default function WaitGalleryOverlay({ open, items, onClose }) {
       className="fixed inset-0 z-[60] flex items-end justify-center bg-black/45 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-8 sm:items-center"
       role="dialog"
       aria-modal="true"
-      aria-label="别人的萌宠搭配"
+      aria-label="看看已出道的毛孩子的定妆照"
     >
       <button
         type="button"
@@ -149,13 +149,13 @@ export default function WaitGalleryOverlay({ open, items, onClose }) {
         <div className="max-h-[min(86dvh,640px)] overflow-y-auto">
           {current ? (
             <>
-              {/* 分享卡上图：全宽铺满固定比例，object-cover 避免竖图两侧留白 */}
-              <div className="relative w-full bg-zinc-100">
-                <div className="relative aspect-[3/4] max-h-[min(52vh,480px)] w-full">
+              {/* 分享卡上图：略小、无描边底色，完整展示不裁切 */}
+              <div className="relative w-full bg-white">
+                <div className="relative flex h-[min(36vh,300px)] min-h-[140px] w-full items-center justify-center">
                   <img
                     src={current.imageUrl}
-                    alt={current.caption || '萌宠搭配'}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    alt={current.caption || '已出道定妆照'}
+                    className="max-h-full max-w-full object-contain"
                     loading="lazy"
                     decoding="async"
                   />
@@ -172,10 +172,10 @@ export default function WaitGalleryOverlay({ open, items, onClose }) {
 
               {/* 分享卡下文：与上图分层，操作区无独立「按钮框」 */}
               <div className="border-t border-zinc-100/90 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-                <p className="text-center text-[15px] font-semibold tracking-tight text-zinc-900">
-                  {current.caption || '别人的萌宠搭配'}
+                <p className="text-center text-[13px] font-semibold tracking-tight text-zinc-900">
+                  {current.caption || '看看已出道的毛孩子的定妆照'}
                 </p>
-                <p className="mt-0.5 text-center text-[11px] text-zinc-400">萌宠出道 · 看看大家的搭配</p>
+                <p className="mt-0.5 text-center text-[10px] text-zinc-400">萌宠出道 · 看看大家的搭配</p>
 
                 <div className="mt-4 flex items-stretch border-t border-zinc-100 pt-3">
                   <button

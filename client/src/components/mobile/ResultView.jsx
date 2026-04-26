@@ -557,15 +557,17 @@ export default function ResultView({
                 </button>
               </div>
               {selectedRank?.imageUrl && (
-                <div className="mb-2 overflow-hidden rounded-2xl border border-rose-200 bg-white/70">
-                  <img
-                    src={selectedRank.imageUrl}
-                    alt={selectedRank.name}
-                    className="h-[30vh] w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="flex items-center justify-between px-2.5 py-1.5 text-[11px]">
+                <div className="mb-2">
+                  <div className="flex h-[min(26vh,220px)] min-h-[100px] w-full items-center justify-center">
+                    <img
+                      src={selectedRank.imageUrl}
+                      alt={selectedRank.name}
+                      className="max-h-full max-w-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between px-0.5 py-1 text-[11px]">
                     <span className="font-semibold text-rose-900">{selectedRank.name}</span>
                     <span className="font-black text-rose-700">❤ {selectedRank.likes}</span>
                   </div>
@@ -593,7 +595,7 @@ export default function ResultView({
                         {idx < 3 ? ['🥇', '🥈', '🥉'][idx] : idx + 1}
                       </span>
                       <div className="flex min-w-0 items-center gap-2">
-                        <span className="inline-flex h-7 w-7 shrink-0 overflow-hidden rounded-full border border-rose-200 bg-white">
+                        <span className="inline-flex h-7 w-7 shrink-0 overflow-hidden rounded-full bg-rose-100/60">
                           <img src={row.imageUrl} alt={row.name} className="h-full w-full object-cover" />
                         </span>
                         <span className="truncate text-xs font-semibold text-rose-900">{row.name}</span>
@@ -621,7 +623,7 @@ export default function ResultView({
                       {selfRankRow.rank}
                     </span>
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="inline-flex h-8 w-8 shrink-0 overflow-hidden rounded-full border border-fuchsia-200 bg-white">
+                      <span className="inline-flex h-8 w-8 shrink-0 overflow-hidden rounded-full bg-fuchsia-100/50">
                         <img src={selfRankRow.imageUrl} alt={selfRankRow.name} className="h-full w-full object-cover" />
                       </span>
                       <span className="truncate text-sm font-semibold text-fuchsia-900">{selfRankRow.name}</span>

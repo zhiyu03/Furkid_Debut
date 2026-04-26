@@ -295,11 +295,8 @@ export default function App() {
               onClick={() => setWaitGalleryOpen(true)}
               className="w-full rounded-full border border-rose-200 bg-white/90 px-4 py-3 text-center text-xs font-bold text-rose-900 shadow-sm backdrop-blur-sm active:scale-[0.99]"
             >
-              点击查看别人的萌宠搭配
+              看看已出道的毛孩子的定妆照
             </button>
-            <p className="max-w-[18rem] text-center text-[11px] leading-relaxed text-gray-400">
-              前期会快速生成预览进度，最终出图以云端真实完成为准。
-            </p>
           </div>
 
           <WaitGalleryOverlay
