@@ -222,12 +222,7 @@ export default function App() {
                 )
               }
             />
-            <MainImagePanel
-              previewUrl={imagePreview}
-              onImageSelected={handleImageSelected}
-              petName={petName}
-              onPetNameChange={setPetName}
-            />
+            <MainImagePanel previewUrl={imagePreview} onImageSelected={handleImageSelected} />
           </div>
 
           <CategoryTabs
@@ -340,6 +335,8 @@ export default function App() {
             original={imagePreview}
             result={resultImage}
             debutOutcome={debutOutcome}
+            petName={petName}
+            onPetNameChange={setPetName}
             onReset={handleReset}
           />
         </div>
