@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "concurrently -n server,client -c cyan,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
     "build": "npm run build --workspace=client",
-    "build:interactive-space": "npm run build --workspace=client && rm -rf interactive-space && mkdir -p interactive-space && cp -R client/dist/. interactive-space/",
+    "build:interactive-space": "npm run build --workspace=client && rm -rf interactive-space && mkdir -p interactive-space && cp -R client/dist/. interactive-space/ && cp client/dist/index.html ./index.html && rm -rf ./assets && cp -R client/dist/assets ./assets",
     "start": "npm run start --workspace=server"
   },
   "devDependencies": {

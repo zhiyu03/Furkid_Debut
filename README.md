@@ -35,7 +35,7 @@ npm run dev
 | --- | --- |
 | `npm run dev` | 同时启动 client（Vite）与 server（Express） |
 | `npm run build` | 构建前端到 `client/dist` |
-| `npm run build:interactive-space` | 构建并拷贝到 `interactive-space/`，供静态部署或内嵌 |
+| `npm run build:interactive-space` | 构建后同步到 **`index.html` + `assets/`（仓库根目录，作为静态入口）** 以及 `interactive-space/` |
 | `npm run start` | 生产态仅启动后端（需先 `npm run build`） |
 
 ## 目录速览

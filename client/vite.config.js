@@ -26,6 +26,8 @@ function readBackendPort() {
 const backendOrigin = `http://127.0.0.1:${readBackendPort()}`
 
 export default defineConfig({
+  // 相对路径，便于根目录 index.html 与静态托管（含子路径）加载资源
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {
