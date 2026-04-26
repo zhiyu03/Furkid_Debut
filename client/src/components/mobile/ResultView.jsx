@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const SHARE_TAGS = '#毛孩子出道计划 #出道潜力分 #萌宠出道 #抖音萌宠'
 
@@ -71,6 +71,7 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
   const [copied, setCopied] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
   const [shareToast, setShareToast] = useState('')
+  const [stampIn, setStampIn] = useState(false)
 
   const shareText = useMemo(() => buildDebutShareCaption(debutOutcome), [debutOutcome])
   const shareTitle = '这就是我家毛孩子的出道定妆'
@@ -155,6 +156,13 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
   const role = debutOutcome?.debutRole
   const hasScore = typeof score === 'number' && role
 
+  useEffect(() => {
+    if (!(hasScore && mode === 'result')) return undefined
+    setStampIn(false)
+    const raf = window.requestAnimationFrame(() => setStampIn(true))
+    return () => window.cancelAnimationFrame(raf)
+  }, [hasScore, mode, result])
+
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {/* 固定顶栏：压缩留白，主图整体上移 */}
@@ -176,14 +184,12 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
               />
               {hasScore && mode === 'result' && (
                 <>
-                  <div className="pointer-events-none absolute left-2 top-2 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 px-2.5 py-1.5 text-white shadow-lg ring-2 ring-white/50">
-                    <p className="text-[8px] font-bold tracking-wide text-white/90">出道分</p>
-                    <p className="mt-0.5 text-center text-lg font-black tabular-nums leading-none tracking-tight">{score}</p>
-                  </div>
-                  <div className="pointer-events-none absolute right-2 top-2 flex max-w-[58%] flex-col items-end gap-1">
+                  <div className="pointer-events-none absolute left-2 top-2">
                     <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-extrabold text-white shadow-md ring-1 ring-white/40">
                       {tierLabel}
                     </span>
+                  </div>
+                  <div className="pointer-events-none absolute right-2 top-2 flex max-w-[58%] flex-col items-end gap-1">
                     <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1 text-[10px] font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
                       <span className="shrink-0 text-[13px] leading-none" aria-hidden>
                         {role.emoji}
@@ -191,9 +197,19 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
                       <span className="min-w-0 truncate">{role.title}</span>
                     </span>
                   </div>
+                  <div
+                    className={`pointer-events-none absolute bottom-2 right-2 rounded-full border-[3px] border-rose-100 bg-rose-600/92 px-3 py-2 text-center text-white shadow-xl transition-all duration-500 ${
+                      stampIn
+                        ? 'translate-y-0 rotate-[-10deg] scale-100 opacity-100'
+                        : 'translate-y-2 rotate-[-18deg] scale-150 opacity-0'
+                    }`}
+                  >
+                    <p className="text-[8px] font-bold tracking-[0.12em] text-rose-100">出道认证</p>
+                    <p className="mt-0.5 text-lg font-black tabular-nums leading-none">{score}</p>
+                  </div>
                 </>
               )}
-              <span className="pointer-events-none absolute bottom-1.5 right-1.5 rounded-full border border-white/25 bg-zinc-900/55 px-2.5 py-1 text-[10px] font-bold text-white shadow-md backdrop-blur-sm">
+              <span className="pointer-events-none absolute bottom-1.5 left-1.5 rounded-full border border-white/25 bg-zinc-900/55 px-2.5 py-1 text-[10px] font-bold text-white shadow-md backdrop-blur-sm">
                 当前 · {modeLabel}
               </span>
             </div>
@@ -275,7 +291,7 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
 
           <div className="rounded-xl border border-rose-100 bg-rose-50/80 px-3 py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-rose-800/90">发抖音 · 复制文案</p>
-            <pre className="mt-1 max-h-20 overflow-y-auto whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-gray-800">
+            <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-gray-800">
               {shareText}
             </pre>
             <div className="mt-2 grid grid-cols-2 gap-2">
@@ -318,14 +334,40 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
             onClick={() => setShareOpen(false)}
           />
           <div className="relative flex h-full w-full flex-col justify-end p-3">
-            <div className="mx-auto flex w-full max-w-[400px] max-h-[70vh] flex-col">
+            <div className="mx-auto flex w-full max-w-[400px] max-h-[84vh] flex-col overflow-y-auto">
               <div className="mb-1.5 flex justify-center">
                 <div className="w-full max-w-[292px] rounded-3xl bg-white p-2.5 shadow-2xl ring-1 ring-black/5">
-                  <img
-                    src={result}
-                    alt="分享卡片预览"
-                    className="max-h-[36vh] w-full rounded-2xl object-contain bg-zinc-100"
-                  />
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-zinc-900/80">
+                    <img
+                      src={result}
+                      alt="分享卡片预览"
+                      className="h-full w-full object-contain"
+                    />
+                    {hasScore && (
+                      <>
+                        <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2 py-1 text-[9px] font-extrabold text-white shadow-md ring-1 ring-white/40">
+                          {tierLabel}
+                        </span>
+                        <span className="pointer-events-none absolute right-2 top-2 inline-flex max-w-[58%] items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 text-[9px] font-bold text-white shadow-md ring-1 ring-white/40">
+                          <span className="shrink-0 text-[11px] leading-none" aria-hidden>
+                            {role.emoji}
+                          </span>
+                          <span className="min-w-0 truncate">{role.title}</span>
+                        </span>
+                        <span className="pointer-events-none absolute bottom-2 right-2 rounded-full border-2 border-rose-100 bg-rose-600/92 px-2.5 py-1.5 text-center text-white shadow-lg">
+                          <span className="block text-[7px] font-bold tracking-[0.12em] text-rose-100">
+                            出道认证
+                          </span>
+                          <span className="mt-0.5 block text-[16px] font-black tabular-nums leading-none">
+                            {score}
+                          </span>
+                        </span>
+                      </>
+                    )}
+                    <span className="pointer-events-none absolute bottom-2 left-2 rounded-full border border-white/25 bg-zinc-900/55 px-2 py-0.5 text-[9px] font-bold text-white shadow-md backdrop-blur-sm">
+                      当前 · 出道定妆
+                    </span>
+                  </div>
                   <p className="mt-1.5 text-center text-xs font-extrabold text-zinc-900">{shareTitle}</p>
                   <p className="mt-0.5 text-center text-[10px] text-zinc-500">{shareSubtitle}</p>
                 </div>
@@ -336,7 +378,7 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
                   <button
                     type="button"
                     onClick={() => setShareOpen(false)}
-                    className="inline-flex h-5.5 w-5.5 items-center justify-center rounded-full bg-zinc-100 text-sm text-zinc-500"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-lg font-bold text-zinc-600 shadow-sm active:bg-zinc-200"
                   >
                     ×
                   </button>

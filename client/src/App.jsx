@@ -121,7 +121,7 @@ export default function App() {
     setGenFastDurationMs(fastDuration)
     setGenProgress(0)
     setGenStartAt(Date.now())
-    setWaitGalleryOpen(false)
+    setWaitGalleryOpen(true)
     setCompletionMessage(null)
     setGallerySession((s) => s + 1)
     setStep(STEPS.GENERATING)
