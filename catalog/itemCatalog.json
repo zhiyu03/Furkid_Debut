@@ -1,9 +1,25 @@
 {
   "categories": [
-    { "id": "headwear", "name": "配饰", "emoji": "👑" },
-    { "id": "makeup", "name": "妆容", "emoji": "💄" },
-    { "id": "styling", "name": "毛发造型", "emoji": "✨" },
-    { "id": "clothing", "name": "衣物", "emoji": "👔" }
+    {
+      "id": "headwear",
+      "name": "配饰",
+      "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E9%85%8D%E9%A5%B0.png"
+    },
+    {
+      "id": "makeup",
+      "name": "妆容",
+      "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%A6%86%E5%AE%B9.png"
+    },
+    {
+      "id": "styling",
+      "name": "毛发造型",
+      "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%AF%9B%E5%8F%91%E9%80%A0%E5%9E%8B.png"
+    },
+    {
+      "id": "clothing",
+      "name": "衣物",
+      "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%A1%A3%E7%89%A9.png"
+    }
   ],
   "maxPerCategory": {
     "headwear": 4,
@@ -13,41 +29,204 @@
   },
   "items": {
     "headwear": [
-      { "id": "bow", "emoji": "🎀", "label": "蝴蝶结", "prompt": "a cute fabric bow on the head, polished and camera-ready" },
-      { "id": "heart-clip", "emoji": "💗", "label": "爱心发夹", "prompt": "a tiny heart-shaped hair clip accent" },
-      { "id": "crown", "emoji": "👑", "label": "小皇冠", "prompt": "a tiny refined golden crown centered on the head" },
-      { "id": "pearl-collar", "emoji": "📿", "label": "珍珠项圈", "prompt": "an elegant pearl collar around the neck" },
-      { "id": "cap", "emoji": "🧢", "label": "棒球帽", "prompt": "a stylish baseball cap fitted naturally for the pet" },
-      { "id": "street-bandana", "emoji": "🧣", "label": "潮酷头巾", "prompt": "a street-style bandana head wrap with cool attitude" },
-      { "id": "leather-choker", "emoji": "🖤", "label": "皮质颈饰", "prompt": "a tasteful leather neck accessory, clean and premium" },
-      { "id": "lace-headband", "emoji": "🪄", "label": "蕾丝发带", "prompt": "a delicate lace headband, sweet and refined" },
-      { "id": "bell-scarf", "emoji": "🔔", "label": "铃铛围脖", "prompt": "a soft neck scarf with a small bell detail" },
-      { "id": "flower", "emoji": "🌸", "label": "小花", "prompt": "a delicate floral hair accessory near one ear" },
-      { "id": "black-glasses", "emoji": "🕶️", "label": "黑框眼镜", "prompt": "sleek black-rimmed glasses styled for a pet portrait" },
-      { "id": "bow-tie", "emoji": "🎗️", "label": "小领结", "prompt": "a neat mini bow tie at the neck" }
+      {
+        "id": "bow",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%9D%B4%E8%9D%B6%E7%BB%93.png",
+        "label": "蝴蝶结",
+        "prompt": "a cute fabric bow on the head, polished and camera-ready"
+      },
+      {
+        "id": "heart-clip",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%88%B1%E5%BF%83%E5%8F%91%E5%A4%B9.png",
+        "label": "爱心发夹",
+        "prompt": "a tiny heart-shaped hair clip accent"
+      },
+      {
+        "id": "crown",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%B0%8F%E7%9A%87%E5%86%A0.png",
+        "label": "小皇冠",
+        "prompt": "a tiny refined golden crown centered on the head"
+      },
+      {
+        "id": "pearl-collar",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%8F%8D%E7%8F%A0%E9%A1%B9%E5%9C%88.png",
+        "label": "珍珠项圈",
+        "prompt": "an elegant pearl collar around the neck"
+      },
+      {
+        "id": "cap",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%A3%92%E7%90%83%E5%B8%BD.png",
+        "label": "棒球帽",
+        "prompt": "a stylish baseball cap fitted naturally for the pet"
+      },
+      {
+        "id": "street-bandana",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%BD%AE%E9%85%B7%E5%A4%B4%E5%B7%BE.png",
+        "label": "潮酷头巾",
+        "prompt": "a street-style bandana head wrap with cool attitude"
+      },
+      {
+        "id": "leather-choker",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%9A%AE%E8%B4%A8%E9%A2%88%E9%A5%B0.png",
+        "label": "皮质颈饰",
+        "prompt": "a tasteful leather neck accessory, clean and premium"
+      },
+      {
+        "id": "lace-headband",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%95%BE%E4%B8%9D%E5%8F%91%E5%B8%A6.png",
+        "label": "蕾丝发带",
+        "prompt": "a delicate lace headband, sweet and refined"
+      },
+      {
+        "id": "bell-scarf",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E9%93%83%E9%93%9B%E5%9B%B4%E8%84%96.png",
+        "label": "铃铛围脖",
+        "prompt": "a soft neck scarf with a small bell detail"
+      },
+      {
+        "id": "flower",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%B0%8F%E8%8A%B1.png",
+        "label": "小花",
+        "prompt": "a delicate floral hair accessory near one ear"
+      },
+      {
+        "id": "black-glasses",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E9%BB%91%E6%A1%86%E7%9C%BC%E9%95%9C.png",
+        "label": "黑框眼镜",
+        "prompt": "sleek black-rimmed glasses styled for a pet portrait"
+      },
+      {
+        "id": "bow-tie",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%B0%8F%E9%A2%86%E7%BB%93.png",
+        "label": "小领结",
+        "prompt": "a neat mini bow tie at the neck"
+      }
     ],
     "makeup": [
-      { "id": "blush", "emoji": "🌷", "label": "腮红", "prompt": "soft natural blush tint on cheeks, subtle and photorealistic" },
-      { "id": "eye-glitter", "emoji": "✨", "label": "眼角闪片", "prompt": "fine glitter accents near the outer eye corners" },
-      { "id": "fine-liner", "emoji": "🖊️", "label": "精致眼线", "prompt": "clean, delicate eyeliner-inspired eye contour accents" }
+      {
+        "id": "blush",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%85%AE%E7%BA%A2.png",
+        "label": "腮红",
+        "prompt": "soft natural blush tint on cheeks, subtle and photorealistic"
+      },
+      {
+        "id": "eye-glitter",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%9C%BC%E8%A7%92%E9%97%AA%E7%89%87.png",
+        "label": "眼角闪片",
+        "prompt": "fine glitter accents near the outer eye corners"
+      },
+      {
+        "id": "fine-liner",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%B2%BE%E8%87%B4%E7%9C%BC%E7%BA%BF.png",
+        "label": "精致眼线",
+        "prompt": "clean, delicate eyeliner-inspired eye contour accents"
+      }
     ],
     "styling": [
-      { "id": "gradient", "emoji": "🌈", "label": "渐变毛色", "prompt": "soft gradient fur tinting with natural blending" },
-      { "id": "sleek-soft", "emoji": "💫", "label": "温柔顺毛", "prompt": "smooth silky fur, softly brushed and elegant" },
-      { "id": "mohawk", "emoji": "⚡", "label": "朋克毛", "prompt": "a playful punk-inspired raised fur ridge style" },
-      { "id": "lazy-wave", "emoji": "🌙", "label": "慵懒微卷", "prompt": "gentle loose waves for a relaxed stylish look" },
-      { "id": "braids", "emoji": "🪢", "label": "小辫子", "prompt": "tiny decorative braids worked into the fur" },
-      { "id": "fluffy", "emoji": "☁️", "label": "蓬松毛", "prompt": "fluffy, lifted fur volume with clean groomed texture" },
-      { "id": "clean-short", "emoji": "✂️", "label": "利落短修毛", "prompt": "clean short trim with sharp tidy silhouette" }
+      {
+        "id": "highlight",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%8C%91%E6%9F%93%E6%AF%9B.png",
+        "label": "挑染",
+        "prompt": "subtle highlight streaks blended naturally in the fur"
+      },
+      {
+        "id": "sleek-soft",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%B8%A9%E6%9F%94%E9%A1%BA%E6%AF%9B.png",
+        "label": "温柔顺毛",
+        "prompt": "smooth silky fur, softly brushed and elegant"
+      },
+      {
+        "id": "lazy-wave",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%85%B5%E6%87%92%E5%BE%AE%E5%8D%B7.png",
+        "label": "慵懒微卷",
+        "prompt": "gentle loose waves for a relaxed stylish look"
+      },
+      {
+        "id": "mohawk",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%9C%8B%E5%85%8B%E6%AF%9B.png",
+        "label": "朋克毛",
+        "prompt": "a playful punk-inspired raised fur ridge style"
+      },
+      {
+        "id": "gradient",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%B8%90%E5%8F%98%E6%AF%9B%E8%89%B2.png",
+        "label": "渐变毛色",
+        "prompt": "soft gradient fur tinting with natural blending"
+      },
+      {
+        "id": "wool-curl",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E7%BE%8A%E6%AF%9B%E5%8D%B7%E8%BD%AF%E6%AF%9B.png",
+        "label": "羊毛卷软毛",
+        "prompt": "soft wool-like curls for a fluffy, gentle look"
+      },
+      {
+        "id": "fluffy",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%93%AC%E6%9D%BE%E6%AF%9B.png",
+        "label": "蓬松毛",
+        "prompt": "fluffy, lifted fur volume with clean groomed texture"
+      },
+      {
+        "id": "clean-short",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%88%A9%E8%90%BD%E7%9F%AD%E4%BF%AE%E6%AF%9B.png",
+        "label": "利落短修毛",
+        "prompt": "clean short trim with sharp tidy silhouette"
+      },
+      {
+        "id": "braids",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%B0%8F%E8%BE%AB%E5%AD%90.png",
+        "label": "小辫子",
+        "prompt": "tiny decorative braids worked into the fur"
+      }
     ],
     "clothing": [
-      { "id": "lolita-cape", "emoji": "🫧", "label": "洛丽塔小斗篷", "prompt": "a cute lolita-inspired mini cape with refined trim" },
-      { "id": "furry-shawl", "emoji": "🪶", "label": "毛绒披肩", "prompt": "a plush furry shawl for luxurious stage styling" },
-      { "id": "workwear-jacket", "emoji": "🧰", "label": "工装外套", "prompt": "a utility workwear jacket with practical styling" },
-      { "id": "knit-sweater", "emoji": "🧶", "label": "软糯针织毛衣", "prompt": "a soft chunky knit sweater, warm and gentle" },
-      { "id": "hoodie", "emoji": "🧥", "label": "卫衣", "prompt": "a cozy street hoodie, modern and youthful" },
-      { "id": "sport-set", "emoji": "🏃", "label": "休闲运动套装", "prompt": "a sporty casual set, energetic and clean" },
-      { "id": "suit", "emoji": "🤵", "label": "西装", "prompt": "a tailored pet-sized suit with clean lines" }
+      {
+        "id": "sport-set",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E4%BC%91%E9%97%B2%E8%BF%90%E5%8A%A8.png",
+        "label": "休闲运动",
+        "prompt": "a sporty casual outfit, energetic and clean"
+      },
+      {
+        "id": "princess-dress",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%85%AC%E4%B8%BB%E8%A3%99.png",
+        "label": "公主裙",
+        "prompt": "a dreamy princess dress with elegant layered details"
+      },
+      {
+        "id": "hoodie",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%8D%AB%E8%A1%A3.png",
+        "label": "卫衣",
+        "prompt": "a cozy street hoodie, modern and youthful"
+      },
+      {
+        "id": "workwear-jacket",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E5%B7%A5%E8%A3%85%E5%A4%96%E5%A5%97.png",
+        "label": "工装外套",
+        "prompt": "a utility workwear jacket with practical styling"
+      },
+      {
+        "id": "tech-vest",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%9C%BA%E8%83%BD%E5%B0%8F%E9%A9%AC%E7%94%B2.png",
+        "label": "机能小马甲",
+        "prompt": "a sleek functional mini vest with techwear accents"
+      },
+      {
+        "id": "lolita-cape",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E6%B4%9B%E4%B8%BD%E5%A1%94%E5%B0%8F%E6%96%97%E7%AF%B7.png",
+        "label": "洛丽塔小斗篷",
+        "prompt": "a cute lolita-inspired mini cape with refined trim"
+      },
+      {
+        "id": "suit",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%A5%BF%E8%A3%85.png",
+        "label": "西装",
+        "prompt": "a tailored pet-sized suit with clean lines"
+      },
+      {
+        "id": "knit-sweater",
+        "emoji": "https://image22222.oss-cn-beijing.aliyuncs.com/%E8%BD%AF%E7%B3%AF%E9%92%88%E7%BB%87%E6%AF%9B%E8%A1%A3.png",
+        "label": "软糯针织毛衣",
+        "prompt": "a soft chunky knit sweater, warm and gentle"
+      }
     ]
   },
   "recommendedLooks": [
@@ -70,7 +249,7 @@
         { "categoryId": "headwear", "itemId": "pearl-collar" },
         { "categoryId": "makeup", "itemId": "fine-liner" },
         { "categoryId": "styling", "itemId": "sleek-soft" },
-        { "categoryId": "clothing", "itemId": "furry-shawl" }
+        { "categoryId": "clothing", "itemId": "princess-dress" }
       ]
     },
     {

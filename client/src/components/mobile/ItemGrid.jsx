@@ -1,4 +1,6 @@
 export default function ItemGrid({ categoryLabel, items, isSelected, onToggle }) {
+  const isImageIcon = (value) => /^https?:\/\//.test(value || '')
+
   return (
     <div className="min-h-0 shrink-0 bg-amber-50/95 px-2 pb-2 pt-1">
       {categoryLabel && (
@@ -21,9 +23,19 @@ export default function ItemGrid({ categoryLabel, items, isSelected, onToggle })
                     : 'bg-yellow-300 hover:bg-yellow-200'
                 }`}
               >
-                <span className="text-2xl leading-none" aria-hidden>
-                  {item.emoji}
-                </span>
+                {isImageIcon(item.emoji) ? (
+                  <img
+                    src={item.emoji}
+                    alt=""
+                    aria-hidden
+                    className="h-7 w-7 rounded-md object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="text-2xl leading-none" aria-hidden>
+                    {item.emoji}
+                  </span>
+                )}
                 <span className="line-clamp-2 text-center text-[10px] font-semibold leading-tight text-amber-950">
                   {item.label}
                 </span>

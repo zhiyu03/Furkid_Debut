@@ -6,6 +6,10 @@ function lookup(categoryId, itemId) {
   return item || { emoji: '❔', label: itemId }
 }
 
+function isImageIcon(value) {
+  return /^https?:\/\//.test(value || '')
+}
+
 export default function SelectedSidebar({ selections, onRemove }) {
   return (
     <aside className="flex w-[34%] min-w-[100px] max-w-[140px] shrink-0 flex-col gap-1.5 overflow-y-auto rounded-xl bg-zinc-300/90 p-2">
@@ -29,7 +33,11 @@ export default function SelectedSidebar({ selections, onRemove }) {
               >
                 ×
               </button>
-              <span className="text-base leading-none">{meta.emoji}</span>
+              {isImageIcon(meta.emoji) ? (
+                <img src={meta.emoji} alt="" aria-hidden className="h-5 w-5 rounded object-cover" />
+              ) : (
+                <span className="text-base leading-none">{meta.emoji}</span>
+              )}
               <div className="mt-0.5 pr-4 font-semibold">
                 {catName}·{meta.label}
               </div>

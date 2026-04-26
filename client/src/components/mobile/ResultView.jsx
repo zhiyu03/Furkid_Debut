@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import debutGallery from '@catalog/debutGallery.json'
 
 const SHARE_TAGS = '#毛孩子出道计划 #出道潜力分 #萌宠出道 #抖音萌宠'
 
@@ -86,6 +87,7 @@ export default function ResultView({
   const [shareToast, setShareToast] = useState('')
   const [stampIn, setStampIn] = useState(false)
   const [nameDraft, setNameDraft] = useState(petName || '')
+  const [selectedRankId, setSelectedRankId] = useState('')
 
   const displayPetName = nameDraft.trim() ? `「${nameDraft.trim()}」` : '毛孩子'
   const shareText = useMemo(
@@ -164,21 +166,70 @@ export default function ResultView({
   const role = debutOutcome?.debutRole
   const hasScore = typeof score === 'number' && role
   const leaderboardRows = useMemo(() => {
-    const rows = [
-      { name: '「奶糖」', score: 96, tier: '本番出道' },
-      { name: '「旺财」', score: 94, tier: '准 C 位' },
-      { name: '「Mochi」', score: 92, tier: '准 C 位' },
-      { name: '「可乐」', score: 90, tier: '上升期新人' },
+    const namePool = [
+      '奶糖',
+      '旺财',
+      '糯米',
+      '可乐',
+      'Mochi',
+      '布丁',
+      '团子',
+      '奥利奥',
+      '元宝',
+      '十一',
+      '球球',
+      'Lucky',
+      '豆包',
+      '啵啵',
+      '雪饼',
     ]
-    if (hasScore) {
-      rows.push({
-        name: displayPetName,
-        score: Math.round(score),
-        tier: tierLabel || '上升期新人',
-      })
+    const source = Array.isArray(debutGallery.items) ? debutGallery.items : []
+    const rows = source.map((item, idx) => {
+      const seed = hashStr(item.id || item.imageUrl || String(idx))
+      const scoreNum = 80 + (seed % 21)
+      const likes = 1200 + (seed % 5200)
+      const name = namePool[(seed + idx) % namePool.length]
+      const rolePool = ['夜场主理喵', '热搜预备役', '镜头狙击手', '综艺感新人王', '限定团宠候补']
+      const roleEmojiPool = ['🌃', '📈', '📷', '🎤', '💝']
+      const badge = rolePool[(seed + 3) % rolePool.length]
+      const badgeEmoji = roleEmojiPool[(seed + 3) % roleEmojiPool.length]
+      return {
+        id: item.id || `gallery-${idx}`,
+        name,
+        score: scoreNum,
+        likes,
+        badge,
+        badgeEmoji,
+        tier: scoreNum >= 96 ? '本番出道' : scoreNum >= 91 ? '准 C 位' : scoreNum >= 86 ? '上升期新人' : '预备役',
+        imageUrl: item.imageUrl,
+      }
+    })
+    return rows.sort((a, b) => b.score - a.score)
+  }, [])
+
+
+  const selfRankRow = useMemo(() => {
+    if (!hasScore) return null
+    const selfScore = Math.round(score)
+    const selfLikes = 100 + ((hashStr(displayPetName) + selfScore) % 900)
+    const higherCount = leaderboardRows.filter((r) => r.score > selfScore).length
+    const rank = higherCount + 1
+    return {
+      id: 'self-rank',
+      rank,
+      name: displayPetName.replace(/[「」]/g, ''),
+      score: selfScore,
+      likes: selfLikes,
+      badge: '我的宠榜',
+      badgeEmoji: '🐾',
+      imageUrl: result,
     }
-    return rows.sort((a, b) => b.score - a.score).slice(0, 5)
-  }, [displayPetName, hasScore, score, tierLabel])
+  }, [hasScore, score, displayPetName, leaderboardRows, result])
+
+  const selectedRank = useMemo(() => {
+    if (selectedRankId === 'self-rank' && selfRankRow) return selfRankRow
+    return leaderboardRows.find((row) => row.id === selectedRankId) || leaderboardRows[0] || selfRankRow || null
+  }, [leaderboardRows, selectedRankId, selfRankRow])
 
   useEffect(() => {
     if (!(hasScore && mode === 'result')) return undefined
@@ -194,6 +245,15 @@ export default function ResultView({
   useEffect(() => {
     onPetNameChange?.(nameDraft.trim())
   }, [nameDraft, onPetNameChange])
+
+  useEffect(() => {
+    if (!leaderboardRows.length) return
+    const validIds = new Set(leaderboardRows.map((r) => r.id))
+    if (selfRankRow) validIds.add('self-rank')
+    if (!selectedRankId || !validIds.has(selectedRankId)) {
+      setSelectedRankId(leaderboardRows[0].id)
+    }
+  }, [leaderboardRows, selectedRankId, selfRankRow])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -217,13 +277,13 @@ export default function ResultView({
               {hasScore && mode === 'result' && (
                 <>
                   <div className="pointer-events-none absolute left-2 top-2">
-                    <span className="tag-art inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-extrabold text-white shadow-md ring-1 ring-white/40">
+                    <span className="tag-art inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-sm font-extrabold text-white shadow-md ring-1 ring-white/40">
                       {tierLabel}
                     </span>
                   </div>
                   <div className="pointer-events-none absolute right-2 top-2 flex max-w-[58%] flex-col items-end gap-1">
-                    <span className="tag-art inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1 text-[10px] font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
-                      <span className="shrink-0 text-[13px] leading-none" aria-hidden>
+                    <span className="tag-art inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
+                      <span className="shrink-0 text-base leading-none" aria-hidden>
                         {role.emoji}
                       </span>
                       <span className="min-w-0 truncate">{role.title}</span>
@@ -402,11 +462,11 @@ export default function ResultView({
                     />
                     {hasScore && (
                       <>
-                        <span className="tag-art pointer-events-none absolute left-2 top-2 inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2 py-1 text-[9px] font-extrabold text-white shadow-md ring-1 ring-white/40">
+                        <span className="tag-art pointer-events-none absolute left-2 top-2 inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1.5 text-sm font-extrabold text-white shadow-md ring-1 ring-white/40">
                           {tierLabel}
                         </span>
-                        <span className="tag-art pointer-events-none absolute right-2 top-2 inline-flex max-w-[58%] items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 text-[9px] font-bold text-white shadow-md ring-1 ring-white/40">
-                          <span className="shrink-0 text-[11px] leading-none" aria-hidden>
+                        <span className="tag-art pointer-events-none absolute right-2 top-2 inline-flex max-w-[58%] items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1.5 text-sm font-bold text-white shadow-md ring-1 ring-white/40">
+                          <span className="shrink-0 text-base leading-none" aria-hidden>
                             {role.emoji}
                           </span>
                           <span className="min-w-0 truncate">{role.title}</span>
@@ -485,32 +545,94 @@ export default function ResultView({
             onClick={() => setRankOpen(false)}
           />
           <div className="relative flex h-full w-full items-end justify-center p-3 sm:items-center">
-            <div className="w-full max-w-[380px] rounded-3xl bg-white p-4 shadow-2xl">
+            <div className="w-full max-w-[390px] rounded-3xl border border-rose-200 bg-gradient-to-b from-rose-100 via-pink-100 to-rose-200 p-3 text-rose-950 shadow-2xl">
               <div className="mb-2 flex items-center justify-between">
-                <p className="text-base font-black text-rose-900">本周热门榜</p>
+                <p className="text-base font-black tracking-wide text-rose-900">毛孩子热度榜</p>
                 <button
                   type="button"
                   onClick={() => setRankOpen(false)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-lg font-bold text-zinc-600"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg font-bold text-rose-700 shadow-sm"
                 >
                   ×
                 </button>
               </div>
-              <p className="mb-2 text-[11px] text-zinc-500">榜单会根据出道分、人气互动综合更新。</p>
+              {selectedRank?.imageUrl && (
+                <div className="mb-2 overflow-hidden rounded-2xl border border-rose-200 bg-white/70">
+                  <img
+                    src={selectedRank.imageUrl}
+                    alt={selectedRank.name}
+                    className="h-[30vh] w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="flex items-center justify-between px-2.5 py-1.5 text-[11px]">
+                    <span className="font-semibold text-rose-900">{selectedRank.name}</span>
+                    <span className="font-black text-rose-700">❤ {selectedRank.likes}</span>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1.5">
-                {leaderboardRows.map((row, idx) => (
-                  <div
-                    key={`${row.name}-${row.score}-${idx}`}
-                    className={`flex items-center gap-2 rounded-xl px-2.5 py-2 ${
-                      idx === 0 ? 'bg-amber-50' : 'bg-zinc-50'
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_116px_66px] items-center rounded-xl bg-rose-300/45 px-2.5 py-1.5 text-[11px] font-semibold text-rose-900">
+                  <span>名次</span>
+                  <span className="pl-9">玩家名</span>
+                  <span className="text-center">标签</span>
+                  <span className="text-right">热度</span>
+                </div>
+                <div className="max-h-[28vh] space-y-1 overflow-y-auto rounded-xl border border-rose-200/60 bg-white/50 p-1.5">
+                  {leaderboardRows.map((row, idx) => (
+                    <button
+                      key={row.id}
+                      type="button"
+                      onClick={() => setSelectedRankId(row.id)}
+                      className={`grid w-full grid-cols-[40px_minmax(0,1fr)_116px_66px] items-center gap-2 rounded-lg px-2.5 py-1.5 text-left ${
+                        selectedRank?.id === row.id ? 'border border-rose-300 bg-rose-100/80' : 'bg-white/80'
+                      }`}
+                    >
+                      <span className="text-center text-xs font-black text-rose-600">
+                        {idx < 3 ? ['🥇', '🥈', '🥉'][idx] : idx + 1}
+                      </span>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="inline-flex h-7 w-7 shrink-0 overflow-hidden rounded-full border border-rose-200 bg-white">
+                          <img src={row.imageUrl} alt={row.name} className="h-full w-full object-cover" />
+                        </span>
+                        <span className="truncate text-xs font-semibold text-rose-900">{row.name}</span>
+                      </div>
+                      <span className="inline-flex w-[106px] items-center gap-1 truncate rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-1.5 py-0.5 text-[9px] font-bold text-white ring-1 ring-white/35">
+                        <span className="shrink-0">{row.badgeEmoji}</span>
+                        <span className="truncate">{row.badge}</span>
+                      </span>
+                      <span className="text-right text-xs font-black text-rose-700">{row.likes}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {selfRankRow && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRankId('self-rank')}
+                    className={`mt-2 grid w-full grid-cols-[40px_minmax(0,1fr)_116px_66px] items-center gap-2 rounded-xl border px-2.5 py-2 text-left ${
+                      selectedRank?.id === 'self-rank'
+                        ? 'border-fuchsia-300 bg-fuchsia-200/55'
+                        : 'border-fuchsia-200 bg-fuchsia-100/50'
                     }`}
                   >
-                    <span className="w-5 text-center text-sm font-black text-zinc-500">{idx + 1}</span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-900">{row.name}</span>
-                    <span className="text-[11px] font-bold text-zinc-500">{row.tier}</span>
-                    <span className="w-10 text-right text-sm font-black text-rose-700">{row.score}</span>
-                  </div>
-                ))}
+                    <span className="text-center text-sm font-black text-fuchsia-700">
+                      {selfRankRow.rank}
+                    </span>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="inline-flex h-8 w-8 shrink-0 overflow-hidden rounded-full border border-fuchsia-200 bg-white">
+                        <img src={selfRankRow.imageUrl} alt={selfRankRow.name} className="h-full w-full object-cover" />
+                      </span>
+                      <span className="truncate text-sm font-semibold text-fuchsia-900">{selfRankRow.name}</span>
+                    </div>
+                    <span className="inline-flex w-[106px] items-center gap-1 truncate rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/35">
+                      <span className="shrink-0">{selfRankRow.badgeEmoji}</span>
+                      <span className="truncate">{selfRankRow.badge}</span>
+                    </span>
+                    <span className="text-right text-sm font-black text-fuchsia-700">{selfRankRow.likes}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
