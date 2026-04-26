@@ -5,7 +5,7 @@
       "label": "练习生",
       "roles": [
         { "title": "素颜围观群众", "tagline": "今天先当气氛组，镜头不转我转", "emoji": "👀" },
-        { "title": "剧组场务喵", "tagline": "离镜头还有三条小鱼干", "emoji": "🎬" },
+        { "title": "剧组场务小厮", "tagline": "离镜头还有三条小鱼干", "emoji": "🎬" },
         { "title": "旁听练习生", "tagline": "C 位在隔壁，你先蹲个机位", "emoji": "🪑" },
         { "title": "后台啃盒饭担当", "tagline": "出道日程从干饭开始排", "emoji": "🍱" },
         { "title": "走位还在背稿中", "tagline": "灯光老师再给我十秒", "emoji": "📋" },
@@ -40,7 +40,7 @@
       "id": "center",
       "label": "准 C 位",
       "roles": [
-        { "title": "C 位预定", "tagline": "九宫格中心只能是我", "emoji": "🎯" },
+        { "title": "绝对视觉焦点", "tagline": "九宫格中心只能是我", "emoji": "🎯" },
         { "title": "限定团宠 ACE", "tagline": "镜头感已点满，就差一条热搜", "emoji": "⭐" },
         { "title": "门面担当预备", "tagline": "生图能打，站姐已就位", "emoji": "✨" },
         { "title": "舞台光追着跑", "tagline": "追光灯找不到别人", "emoji": "🔦" },
@@ -52,7 +52,6 @@
       "id": "diva",
       "label": "本番出道",
       "roles": [
-        { "title": "女明星本星", "tagline": "红毯已铺，请叫我老师", "emoji": "👑" },
         { "title": "绝对 C 位", "tagline": "团体照请自动把我放中间", "emoji": "💎" },
         { "title": "顶流毛孩子", "tagline": "站姐镜头已虚焦在我睫毛", "emoji": "🌟" },
         { "title": "红毯定海神针", "tagline": "闪光灯为我加班", "emoji": "📸" },
