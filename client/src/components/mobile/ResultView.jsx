@@ -185,12 +185,12 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
               {hasScore && mode === 'result' && (
                 <>
                   <div className="pointer-events-none absolute left-2 top-2">
-                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-extrabold text-white shadow-md ring-1 ring-white/40">
+                    <span className="tag-art inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-extrabold text-white shadow-md ring-1 ring-white/40">
                       {tierLabel}
                     </span>
                   </div>
                   <div className="pointer-events-none absolute right-2 top-2 flex max-w-[58%] flex-col items-end gap-1">
-                    <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1 text-[10px] font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
+                    <span className="tag-art inline-flex max-w-full items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2.5 py-1 text-[10px] font-bold leading-tight text-white shadow-md ring-1 ring-white/40">
                       <span className="shrink-0 text-[13px] leading-none" aria-hidden>
                         {role.emoji}
                       </span>
@@ -345,10 +345,10 @@ export default function ResultView({ original, result, debutOutcome = null, onRe
                     />
                     {hasScore && (
                       <>
-                        <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2 py-1 text-[9px] font-extrabold text-white shadow-md ring-1 ring-white/40">
+                        <span className="tag-art pointer-events-none absolute left-2 top-2 inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2 py-1 text-[9px] font-extrabold text-white shadow-md ring-1 ring-white/40">
                           {tierLabel}
                         </span>
-                        <span className="pointer-events-none absolute right-2 top-2 inline-flex max-w-[58%] items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 text-[9px] font-bold text-white shadow-md ring-1 ring-white/40">
+                        <span className="tag-art pointer-events-none absolute right-2 top-2 inline-flex max-w-[58%] items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 text-[9px] font-bold text-white shadow-md ring-1 ring-white/40">
                           <span className="shrink-0 text-[11px] leading-none" aria-hidden>
                             {role.emoji}
                           </span>
