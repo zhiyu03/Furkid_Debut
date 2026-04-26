@@ -81,8 +81,8 @@ export default function ResultView({
   onReset,
 }) {
   const [mode, setMode] = useState('result')
-  const [copied, setCopied] = useState(false)
   const [shareOpen, setShareOpen] = useState(false)
+  const [rankOpen, setRankOpen] = useState(false)
   const [shareToast, setShareToast] = useState('')
   const [stampIn, setStampIn] = useState(false)
   const [nameDraft, setNameDraft] = useState(petName || '')
@@ -105,16 +105,6 @@ export default function ResultView({
       return result
     }
   }, [result])
-
-  const handleCopyCaption = async () => {
-    try {
-      await navigator.clipboard.writeText(shareText)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2000)
-    } catch {
-      setCopied(false)
-    }
-  }
 
   const showToast = (msg) => {
     setShareToast(msg)
@@ -173,6 +163,22 @@ export default function ResultView({
   const tierLabel = debutOutcome?.debutTierLabel
   const role = debutOutcome?.debutRole
   const hasScore = typeof score === 'number' && role
+  const leaderboardRows = useMemo(() => {
+    const rows = [
+      { name: '「奶糖」', score: 96, tier: '本番出道' },
+      { name: '「旺财」', score: 94, tier: '准 C 位' },
+      { name: '「Mochi」', score: 92, tier: '准 C 位' },
+      { name: '「可乐」', score: 90, tier: '上升期新人' },
+    ]
+    if (hasScore) {
+      rows.push({
+        name: displayPetName,
+        score: Math.round(score),
+        tier: tierLabel || '上升期新人',
+      })
+    }
+    return rows.sort((a, b) => b.score - a.score).slice(0, 5)
+  }, [displayPetName, hasScore, score, tierLabel])
 
   useEffect(() => {
     if (!(hasScore && mode === 'result')) return undefined
@@ -320,7 +326,33 @@ export default function ResultView({
             <pre className="mt-1 whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-gray-800">
               {shareText}
             </pre>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+          </div>
+
+          <div className="rounded-xl border border-rose-100 bg-white px-3 py-2.5">
+            <p className="text-[11px] font-semibold text-rose-900">给毛孩子取个艺名（可选）</p>
+            <p className="mt-0.5 text-[10px] text-zinc-500">起名后可参与热门榜展示，也会带入分享文案。</p>
+            <div className="mt-1.5 flex gap-1.5">
+              <input
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value.slice(0, 12))}
+                placeholder="例如：奶糖 / 旺财 / Mochi"
+                className="min-w-0 flex-1 rounded-xl border border-rose-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-rose-300"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setNameDraft(
+                    ARTIST_NAME_SUGGESTIONS[Math.floor(Math.random() * ARTIST_NAME_SUGGESTIONS.length)]
+                  )
+                }
+                className="shrink-0 rounded-xl border border-rose-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-rose-700 active:scale-[0.98]"
+              >
+                随机艺名
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-0.5 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setShareOpen(true)}
@@ -330,12 +362,11 @@ export default function ResultView({
               </button>
               <button
                 type="button"
-                onClick={handleCopyCaption}
+                onClick={() => setRankOpen(true)}
                 className="rounded-full border-2 border-rose-200 bg-white py-2 text-center text-xs font-bold text-rose-900 shadow-sm active:scale-[0.99]"
               >
-                {copied ? '已复制到剪贴板' : '一键复制文案'}
+                查看热门榜
               </button>
-            </div>
           </div>
 
           <button
@@ -409,30 +440,6 @@ export default function ResultView({
                     ×
                   </button>
                 </div>
-                <div className="mb-2 rounded-2xl border border-rose-100 bg-rose-50/70 p-2">
-                  <p className="text-[10px] font-semibold text-rose-800">给毛孩子取个艺名（可选）</p>
-                  <div className="mt-1.5 flex gap-1.5">
-                    <input
-                      value={nameDraft}
-                      onChange={(e) => setNameDraft(e.target.value.slice(0, 12))}
-                      placeholder="例如：奶糖 / 旺财 / Mochi"
-                      className="min-w-0 flex-1 rounded-xl border border-rose-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-rose-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setNameDraft(
-                          ARTIST_NAME_SUGGESTIONS[
-                            Math.floor(Math.random() * ARTIST_NAME_SUGGESTIONS.length)
-                          ]
-                        )
-                      }
-                      className="shrink-0 rounded-xl border border-rose-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-rose-700 active:scale-[0.98]"
-                    >
-                      随机艺名
-                    </button>
-                  </div>
-                </div>
                 <div className="grid grid-cols-3 gap-y-2">
                   {shareActions.map((action) => (
                     <button
@@ -466,6 +473,47 @@ export default function ResultView({
       {shareToast && (
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-black/80 px-3 py-1.5 text-xs font-medium text-white">
           {shareToast}
+        </div>
+      )}
+
+      {rankOpen && (
+        <div className="fixed inset-0 z-50 bg-black/45">
+          <button
+            type="button"
+            aria-label="关闭热门榜"
+            className="absolute inset-0"
+            onClick={() => setRankOpen(false)}
+          />
+          <div className="relative flex h-full w-full items-end justify-center p-3 sm:items-center">
+            <div className="w-full max-w-[380px] rounded-3xl bg-white p-4 shadow-2xl">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-base font-black text-rose-900">本周热门榜</p>
+                <button
+                  type="button"
+                  onClick={() => setRankOpen(false)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-lg font-bold text-zinc-600"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="mb-2 text-[11px] text-zinc-500">榜单会根据出道分、人气互动综合更新。</p>
+              <div className="space-y-1.5">
+                {leaderboardRows.map((row, idx) => (
+                  <div
+                    key={`${row.name}-${row.score}-${idx}`}
+                    className={`flex items-center gap-2 rounded-xl px-2.5 py-2 ${
+                      idx === 0 ? 'bg-amber-50' : 'bg-zinc-50'
+                    }`}
+                  >
+                    <span className="w-5 text-center text-sm font-black text-zinc-500">{idx + 1}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-900">{row.name}</span>
+                    <span className="text-[11px] font-bold text-zinc-500">{row.tier}</span>
+                    <span className="w-10 text-right text-sm font-black text-rose-700">{row.score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
